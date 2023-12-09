@@ -170,11 +170,13 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     //and or and
 
     /*
-    0               Anna Grace                  Del Rio                       CS                       22
-    1                   Calvin                      Woo                  Physics                       22
-    2                      Flo                      Yao                       CS                       20
-    3                      Flo                  Jackson                     Math                       21*/
+    0                      Flo                      Yao                       CS                       20
+    1                     Flo                  Jackson                     Math                        21
+    2                   Calvin                      Woo                  Physics                       22
+    3               Anna Grace                  Del Rio                       CS                       22
+    */
 
+   //203
     SQL sql; 
     for(int i = 0; i < commands.size(); i++){
       sql.command(commands[i]); 
@@ -199,15 +201,20 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    command = "select * from student where age <30 and major=CS or major = Physics and lname = Jackson"; 
+    command = "select * from student where lname = Yang or major = CS and age < 23 or lname = Jackson"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+
+    command = "select * from student where age <30 and major=CS or major = Physics and lname = Jackson"; //this is not working..... hmm
+    //del rio, yao 
+    //age 30 < major CS = and major Physics = lname Jackson = and or --> should be postfix im guessing
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    command = "select * from student where lname = Yang or major = CS and age < 23 or lname = Jackson"; 
-    cout<<"command: "<<command<<endl; 
-    cout<<sql.command(command)<<endl; 
-    sql.select_recnos(); 
+   
 
   }
 }

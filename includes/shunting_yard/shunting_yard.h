@@ -7,6 +7,8 @@
 #include "../../includes/table/constants.h"
 #include "../../includes/tokenTypes/Operator.h"
 
+
+
 class ShuntingYard{
     public: 
         ShuntingYard(); 
@@ -77,6 +79,16 @@ void ShuntingYard::popRest(Queue<Token*>& output, Stack<Token*>& operators){
 }
 
 
+//original age < 30 and major = CS or major = Physics and lname = Jackson 
+//age 30 < major CS = and major Physics = lname Jackson = and or --> should be postfix im guessing
+
+//relational > logical prec --? pop only when you are less than to top prec 
+//was less than equal 
+
+
+//age < 30 and major = CS or major = Physics and lname = Jack
+//age 30 < major CS = major Physics = lname Jack = and or and
+
 Queue<Token*> ShuntingYard::postfix(Queue<Token*> inFix){
     Queue<Token*> numbers;
     Stack<Token*> operators; 
@@ -104,7 +116,8 @@ void ShuntingYard::operatorDecider(Token* popped, Queue<Token*>& symbols, Stack<
      int precedence = static_cast<Operator*>(popped)->getPrecedence();
 
      //while operators stack not empty and the precedence of the popped operator is lower than the precednece of the operator on the stack 
-     while(!operators.empty() && precedence <= static_cast<Operator*>((operators.top()))->getPrecedence()){
+    while(!operators.empty() && precedence < static_cast<Operator*>((operators.top()))->getPrecedence()){
+    //if(precedence <= static_cast<Operator*>((operators.top()))->getPrecedence()){ //just popping once 
         stackOp = operators.pop(); 
         symbols.push(stackOp); //add to output 
     }

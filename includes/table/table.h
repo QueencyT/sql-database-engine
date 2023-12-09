@@ -323,7 +323,7 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
         int type = popped->getType(); 
         string tokVal = popped->getToken(); 
         //cout<<"popped: "<<tokVal<<endl; 
-       // cout<<"post fix stack: "; 
+        //cout<<"post fix stack: "; 
        // printQueue(postFix); 
 
         if(type == RELATIONAL_TYPE){//relational, logical
