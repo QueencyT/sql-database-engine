@@ -1,0 +1,54 @@
+#ifndef OPERATOR_H 
+#define OPERATOR_H 
+#include <iostream>
+#include "../../includes/token/token.h"
+#include "../../includes/table/constants.h"
+
+using namespace std; 
+
+class Operator : public Token{ //and relational and logical will inerit from here
+    public: 
+        Operator(); 
+        Operator(int prec); 
+        Operator(int type, string val); 
+        Operator(int type, string val, int prec); 
+        int getPrecedence(); 
+        int setPrecedence(int prec); 
+    private: 
+        int precedence; 
+}; 
+
+
+Operator::Operator() : Token(OPERATOR_TYPE){
+    precedence = -1; 
+}
+
+Operator::Operator(int prec) : Token(OPERATOR_TYPE){
+    precedence = prec; 
+}
+
+Operator::Operator(int type, string val) : Token(type, val){
+
+}
+
+Operator::Operator(int opType, string val, int prec) : Token(opType, val){
+    if(opType == RELATIONAL_TYPE){
+        precedence = RELATIONAL_PRECEDENCE; 
+    }
+    else if(opType == LOGICAL_TYPE){
+        precedence = LOGICAL_PRECEDENCE; 
+    }
+    else{
+        cout<<"INVALID OPERATOR TYPE: OPERATOR NOT LOGICAL/RELATIONAL\n"; 
+    }
+}
+
+int Operator::getPrecedence(){
+    return precedence; 
+}
+
+int Operator::setPrecedence(int prec){
+    precedence = prec; 
+}
+
+#endif 
