@@ -147,8 +147,8 @@ void STokenizer::make_table(int _table[][MAX_COLUMNS]){
     //for parentheses state
     mark_cell(0,_table,'(', 25); 
     mark_cell(0,_table,')',25); 
-    mark_cell(25,_table,'(', 25); 
-    mark_cell(25,_table,')',25); 
+    //mark_cell(25,_table,'(', 25); 
+    //mark_cell(25,_table,')',25); 
 
 
 }

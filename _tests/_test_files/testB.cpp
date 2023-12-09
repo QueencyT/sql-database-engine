@@ -207,7 +207,7 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     sql.select_recnos();
 
 
-    command = "select * from student where age <30 and major=CS or major = Physics and lname = Jackson"; //this is working
+    command = "select * from student where age <30 and major = CS or major = Physics and lname = Jackson"; //this is working
     //del rio, yao 
     //age 30 < major CS = and major Physics = lname Jackson = and or --> should be postfix im guessing
     cout<<"command: "<<command<<endl; 
@@ -248,6 +248,37 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     sql.select_recnos(); 
 
    
+
+  }
+}
+
+bool test_parentheses(bool debug){
+  if(debug){
+    string s1 = "make table student fields fname, lname, major, age"; 
+    string s2 = "insert into student values Flo, Yao, CS, 20"; 
+    string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
+    string s4 = "insert into student values Calvin, Woo, Physics,22"; 
+    string s5 = "insert into student values \"Anna Grace\", \"Del Rio\", CS, 22"; 
+    vector<string> commands; 
+    commands.push_back(s1);  
+    commands.push_back(s2); 
+    commands.push_back(s3); 
+    commands.push_back(s4); 
+    commands.push_back(s5);
+
+    SQL sql; 
+    for(int i = 0; i < commands.size(); i++){
+      sql.command(commands[i]); 
+    }
+    cout<<"full table\n"; 
+    cout<<sql.command("select * from student")<<endl; 
+
+
+    string command; 
+    command = "select * from student where age <30 and ((major = CS or major = Physics) and (lname < Y))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
 
   }
 }
@@ -296,6 +327,10 @@ TEST(TEST_LOGICAL, testLogical){
 
 TEST(TEST_COMBINE, testCombine){
   EXPECT_EQ(1, test_combine(false)); 
+}
+
+TEST(TEST_PARENTHESES, testParen){
+  EXPECT_EQ(1, test_parentheses(true)); 
 }
 bool test_stub(bool debug = false)
 {
