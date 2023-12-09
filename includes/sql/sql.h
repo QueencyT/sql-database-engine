@@ -51,8 +51,8 @@ Table SQL::command(string com){
         returnTable = selectCommand(tableName);  
     } 
 
-    cout<<"table\n"; 
-    cout<<returnTable<<endl; 
+    //cout<<"table\n"; 
+    //cout<<returnTable<<endl; 
     return returnTable; 
 }
 
@@ -74,8 +74,6 @@ Table SQL::selectCommand(string tableName){
     vector<string> fields = statementTree.get("fields");  
     mTable = Table(tableName.c_str());
     allFields = mTable.getFields(); 
-
-    //mtable is the select all table...... 
 
     if(selectAll() && !hasCondition()){
         cout<<"select all with no condition\n"; 

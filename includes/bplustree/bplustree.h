@@ -213,17 +213,19 @@ BPlusTree<T>::Iterator nullIter;
 }     
 //return an iterator to this key. NULL if not there.
 
+//20 21 22 22
 template <typename T>
 typename BPlusTree<T>::Iterator BPlusTree<T>::lower_bound(const T& key){ //assuming we are trying to find the previous ???
     BPlusTree<T>::Iterator found; 
 
     for(BPlusTree<T>::Iterator iter = begin(); iter != end(); iter++){
-        if(*iter > key || *iter == key){
-            found = iter;  
+        if(*iter > key || *iter == key){ 
+            found = iter;
             return found; 
         }
     }
-    return found; 
+    return end();
+    //return found; 
 }
 //return first that goes NOT BEFORE
 // key entry or next if does not
@@ -234,7 +236,7 @@ typename BPlusTree<T>::Iterator BPlusTree<T>::upper_bound(const T& key){//assumi
     //cout<<"upper bound called\n";
      BPlusTree<T>::Iterator found; 
 
-    for(BPlusTree<T>::Iterator iter = begin(); iter != end(); iter++){
+    for(BPlusTree<T>::Iterator iter = begin(); iter != end(); iter++){ //what if we are the greatest?? --> end 
         if(*iter > key){//the first time we find something greater
             //cout<<"found\n";
             found = iter; 
