@@ -28,7 +28,21 @@ Operator::Operator(int prec) : Token(OPERATOR_TYPE){
 }
 
 Operator::Operator(int type, string val) : Token(type, val){
-
+    if(type == RELATIONAL_TYPE){
+        precedence = RELATIONAL_PRECEDENCE; 
+    }
+    else if(type == LOGICAL_TYPE){
+        if(val == "and"){
+            precedence = LOGICAL_AND_PRECEDENCE; 
+        }
+        else if(val == "or"){
+            precedence = LOGICAL_OR_PRECEDENCE; 
+        }
+        //precedence = LOGICAL_PRECEDENCE; 
+    }
+    else{
+        cout<<"INVALID OPERATOR TYPE: OPERATOR NOT LOGICAL/RELATIONAL\n"; 
+    }
 }
 
 Operator::Operator(int opType, string val, int prec) : Token(opType, val){
@@ -36,7 +50,13 @@ Operator::Operator(int opType, string val, int prec) : Token(opType, val){
         precedence = RELATIONAL_PRECEDENCE; 
     }
     else if(opType == LOGICAL_TYPE){
-        precedence = LOGICAL_PRECEDENCE; 
+        if(val == "and"){
+            precedence = LOGICAL_AND_PRECEDENCE; 
+        }
+        else if(val == "or"){
+            precedence = LOGICAL_OR_PRECEDENCE; 
+        }
+        //precedence = LOGICAL_PRECEDENCE; 
     }
     else{
         cout<<"INVALID OPERATOR TYPE: OPERATOR NOT LOGICAL/RELATIONAL\n"; 

@@ -12,7 +12,7 @@ class Logical : public Operator{
     private: 
 }; 
 
-Logical::Logical(string logicalOp) : Operator(LOGICAL_TYPE, logicalOp, LOGICAL_PRECEDENCE){
+Logical::Logical(string logicalOp) : Operator(LOGICAL_TYPE, logicalOp){ //MODIFIED, was LOGICAL_PRECEDENCE being passed in befroe 
 
 }
 

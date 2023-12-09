@@ -94,11 +94,13 @@ Queue<Token*> ShuntingYard::postfix(Queue<Token*> inFix){
     Stack<Token*> operators; 
     while(!inFix.empty()){
         Token* popped = inFix.pop(); 
+        //cout<<"popped: "<<*popped<<endl; 
         
         if(popped->getToken() == ")" || popped->getToken() == "("){
             parenDecider(popped, numbers,operators); 
         }
         else if(popped->getType() == RELATIONAL_TYPE || popped->getType() == LOGICAL_TYPE){ 
+           // cout<<"precedence: "<<static_cast<Operator*>(popped)->getType()<<endl; 
             operatorDecider(popped, numbers, operators);  
         }
         else{
@@ -116,8 +118,7 @@ void ShuntingYard::operatorDecider(Token* popped, Queue<Token*>& symbols, Stack<
      int precedence = static_cast<Operator*>(popped)->getPrecedence();
 
      //while operators stack not empty and the precedence of the popped operator is lower than the precednece of the operator on the stack 
-    while(!operators.empty() && precedence < static_cast<Operator*>((operators.top()))->getPrecedence()){
-    //if(precedence <= static_cast<Operator*>((operators.top()))->getPrecedence()){ //just popping once 
+    while(!operators.empty() && precedence <= static_cast<Operator*>((operators.top()))->getPrecedence()){
         stackOp = operators.pop(); 
         symbols.push(stackOp); //add to output 
     }

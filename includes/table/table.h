@@ -328,7 +328,7 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
 
         if(type == RELATIONAL_TYPE){//relational, logical
             if(!toBeEvaluated.empty()){ //prob won't be empty 
-               // cout<<"inside relational\n"; 
+                //cout<<"inside relational\n"; 
                 string key = toBeEvaluated.pop(); //first pop key, second pop field name
                 //cout<<"key: "<<key<<endl; 
                 string field = toBeEvaluated.pop(); 
@@ -343,7 +343,7 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
         }
         else if(type == LOGICAL_TYPE){
             if(!recNums.empty()){
-                //cout<<"inside logical\n"; 
+               // cout<<"inside logical\n"; 
                 vector<long> left = recNums.pop(); 
                 vector<long> right = recNums.pop(); 
                 vector<long> received = eval(left, tokVal, right);
@@ -362,6 +362,13 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
     selectedVec = res; 
     Table returnTable = vector_to_table(fields, res);
     return returnTable; 
+
+    //2 0
+
+    //2 and 0
+
+
+    
 }
 
 

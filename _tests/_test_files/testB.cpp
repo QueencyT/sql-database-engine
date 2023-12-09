@@ -207,7 +207,40 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     sql.select_recnos();
 
 
-    command = "select * from student where age <30 and major=CS or major = Physics and lname = Jackson"; //this is not working..... hmm
+    command = "select * from student where age <30 and major=CS or major = Physics and lname = Jackson"; //this is working
+    //del rio, yao 
+    //age 30 < major CS = and major Physics = lname Jackson = and or --> should be postfix im guessing
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    //age <30 and major=CS or major = Physics and lname = Jackson
+    //age 30 < major CS = and major Physics = or lname Jackson = 
+    //
+    //maybe and and or needs different precs
+    // or < and prec?? 
+
+    //age <30 and major=CS or major = Physics and lname = Jackson
+    //age 30 < major CS = and major Physics = lname Jackson = and or
+
+
+
+
+    //2 + 3 * 3 + 5 / 4 + 8 * 10 + 11
+    //2 3 + 3 5 + * 4 8 + / 10 11 +
+
+    //
+    //age 30 > major Art = and major Physics = or lname Woo = and
+    //hmm
+
+
+
+    //[and]
+    //[1] [2,0,3]
+
+    //[age] [30] [>] [major] [Art] [=] [and] [major] [Physics] [=] [or] [lname] [Woo] [=] [and]
+
+    command = "select * from student where age > 30 and major=Art or major = Physics and lname = Woo"; //this is not working
     //del rio, yao 
     //age 30 < major CS = and major Physics = lname Jackson = and or --> should be postfix im guessing
     cout<<"command: "<<command<<endl; 
