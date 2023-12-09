@@ -13,7 +13,7 @@ class Operator : public Token{ //and relational and logical will inerit from her
         Operator(int type, string val); 
         Operator(int type, string val, int prec); 
         int getPrecedence(); 
-        int setPrecedence(int prec); 
+        void setPrecedence(int prec); 
     private: 
         int precedence; 
 }; 
@@ -47,7 +47,7 @@ int Operator::getPrecedence(){
     return precedence; 
 }
 
-int Operator::setPrecedence(int prec){
+void Operator::setPrecedence(int prec){
     precedence = prec; 
 }
 

@@ -16,7 +16,19 @@ class SQL{
     Parser parser; 
     vector<string> allFields; 
     MMap<string,string> statementTree; 
-    Table select_command(); 
+    Table selectCommand(string tableName);
+    Table makeCommand(string tableName); 
+    Table insertCommand(string tableName); 
+    //boolean helper functions 
+    bool hasCondition(); 
+    bool selectAll(); 
+
+    vector<string> printFields(vector<string> f){
+        for(int i = 0; i < f.size(); i++){
+            cout<<f[0]<<" "; 
+        }
+        cout<<endl; 
+    }
 }; 
 
 vector<long> SQL::select_recnos(){
@@ -26,52 +38,70 @@ vector<long> SQL::select_recnos(){
 Table SQL::command(string com){
     parser.set_string(com); 
     statementTree = parser.parse_tree(); 
-
-    vector<string> command = statementTree.get("command"); //will always have a t
-    vector<string> tableName = statementTree.get("table_name");
+    string command = statementTree.get("command")[0]; //will always have a t
+    string tableName = statementTree.get("table_name")[0];
     Table returnTable; 
 
-    if(command[0] == "make" || command[0] == "create"){
-       vector<string> col = statementTree.get("col");
-       allFields = col; 
-       mTable = Table(tableName[0].c_str(), col); //creating table //for now 
+    if(command == "make" || command == "create"){
+        returnTable = makeCommand(tableName); 
     }
-    else if(command[0] == "insert"){
-        mTable = Table(tableName[0].c_str()); 
-        vector<string> vals = statementTree.get("values");
-        mTable.insert_into(vals); 
-    }else if(command[0] == "select"){ //if * or age,lname, 
-        Table tab = select_command(); 
-        cout<<"table\n"; 
-        cout<<tab<<endl; 
-        return tab; 
+    else if(command == "insert"){
+       returnTable =  insertCommand(tableName); 
+    }else if(command == "select"){ //if * or age,lname, 
+        returnTable = selectCommand(tableName);  
     } 
+
+    cout<<"table\n"; 
+    cout<<returnTable<<endl; 
+    return returnTable; 
+}
+
+Table SQL::makeCommand(string tableName){
+    vector<string> col = statementTree.get("col");
+    allFields = col; 
+    mTable = Table(tableName.c_str(), col); //creating table //for now 
     return mTable; 
 }
 
-Table SQL::select_command(){
-    //assuming at this point 
-        string tableName = statementTree.get("table_name")[0]; 
-        vector<string> fields = statementTree.get("fields");  
-        mTable = Table(tableName.c_str());
-        allFields = mTable.getFields(); 
-        if(fields.at(0) == "*" && !statementTree.contains("where")){
-            cout<<"select all with no condition\n"; 
-            return mTable.select_all(allFields);  
-        }
-        else if(fields.at(0) == "*" && statementTree.contains("where")){
-            cout<<"select all with conditon\n"; 
-            vector<string> condition = statementTree.get("condition"); 
-            return mTable.select(allFields, condition);
-        }
-        else if(fields.at(0) != "*" && !statementTree.contains("where")){
-            cout<<"regular select with no conditions\n"; 
-            return mTable.select_all(fields); 
-        }
-        else{
-            vector<string> condition = statementTree.get("condition");
-            return mTable.select(fields, condition); 
-        }
+Table SQL::insertCommand(string tableName){
+    mTable = Table(tableName.c_str()); 
+    vector<string> vals = statementTree.get("values");
+    mTable.insert_into(vals); 
+    return mTable; 
 }
-//command selector --> if(command == make) if(command = insert) if(command = select)
+
+Table SQL::selectCommand(string tableName){
+    vector<string> fields = statementTree.get("fields");  
+    mTable = Table(tableName.c_str());
+    allFields = mTable.getFields(); 
+
+    //mtable is the select all table...... 
+
+    if(selectAll() && !hasCondition()){
+        cout<<"select all with no condition\n"; 
+        return mTable.select_all(allFields);  
+    }
+    else if(selectAll() && hasCondition()){
+        cout<<"select all with condition\n"; 
+        vector<string> condition = statementTree.get("condition"); 
+        return mTable.select(allFields, condition);
+    }
+    else if(!selectAll() && !hasCondition()){
+        cout<<"regular select with no condition\n"; 
+        return mTable.select_all(fields); 
+    }
+    else{//if not select all and has a condition
+        cout<<"regular select with condition\n"; 
+        vector<string> condition = statementTree.get("condition");
+        return mTable.select(fields, condition); 
+    }
+}
+
+bool SQL::hasCondition(){
+    return statementTree.contains("where"); 
+}
+
+bool SQL::selectAll(){
+    return (statementTree.get("fields")[0] == "*"); 
+}
 #endif

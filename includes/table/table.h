@@ -83,6 +83,13 @@ class Table{
         //logical eval functions 
         vector<long> combine(vector<long> left, vector<long> right);
         vector<long> intersection(vector<long> left, vector<long> right);
+
+        vector<string> printFields(vector<string> f){
+        for(int i = 0; i < f.size(); i++){
+            cout<<f[0]<<" "; 
+        }
+        cout<<endl; 
+    }
 }; 
 //a vector of multimaps 
 
@@ -134,6 +141,7 @@ Table::Table(const char fileName[]){
     recordReader.read(savedInfo, 0); //reading the saved info 
     vector<string> savedFields = recordReader.get_record(); 
     buildIndexes(savedFields);
+   // cout<<"ctor fired\n"; 
     fields = savedFields; 
     initTable(aFile); 
 
@@ -149,7 +157,7 @@ Table::Table(const char fileName[], vector<string> fieldNames){
 
     open_fileW(aFile, filName.c_str()); 
     open_fileW(info, saveName.c_str()); 
-    saveInfo.write(info); 
+    saveInfo.write(info);
 
     buildIndexes(fieldNames); 
     fields = fieldNames; 
@@ -202,12 +210,17 @@ vector<long> Table::eval(string field, string op, string key){
     }else if(op == ">"){
         recnos = iterate(upBound, end); 
     }else if(op == "<"){
-        recnos = iterate(beg, lowBound); //lowerbound will get == or >
+        recnos = iterate(beg, lowBound); //lowerbound will get == or > // but will stop before then
     }else if(op == ">="){
         recnos = iterate(lowBound, end); 
     }else if(op == "<="){
-        MMap<string,long>::Iterator next = lowBound++; 
+        //cout<<"key: "<<key<<endl; 
+       MPair<string, long> low = *lowBound; 
+       if(low.key == key){
+        MMap<string,long>::Iterator next = lowBound++;
         recnos = iterate(beg, next); 
+       }
+       recnos = iterate(beg, lowBound); 
     }else{
         cout<<"INVALID OPERAND TYPE\n"; 
     }
@@ -341,7 +354,7 @@ void Table::print_table() const{
         vector<string> rec = recordedFiles.get_record(); 
         cout<<i; 
         for(int i = 0; i < rec.size(); i++){
-            cout<<setw(10)<<rec[i];  
+            cout<<setw(25)<<rec[i];  
         }
         cout<<endl; 
         bytes = recordedFiles.read(aFile, ++i);
