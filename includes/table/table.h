@@ -310,11 +310,15 @@ Table Table::select(vector<string> fields, string field, string op, string key){
     return returnTable; 
 }
 
+//[5] [0 1 2 3 4 5 6]
 Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should prob not have any parentheses 
     //fields --> what to display on table (only fname or only lname)
     Stack<string> toBeEvaluated; 
     Stack<vector<long>> recNums; 
     vector<long> mVec; 
+
+    cout<<"TABLE\n"; 
+    cout<<*this<<endl; 
     
     //result vec
     //when evaluated, a vector of recnos will be returned.... 
@@ -322,20 +326,20 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
         Token* popped = postFix.pop(); 
         int type = popped->getType(); 
         string tokVal = popped->getToken(); 
-        //cout<<"popped: "<<tokVal<<endl; 
+        cout<<"popped: "<<tokVal<<endl; 
         //cout<<"post fix stack: "; 
        // printQueue(postFix); 
 
         if(type == RELATIONAL_TYPE){//relational, logical
             if(!toBeEvaluated.empty()){ //prob won't be empty 
-                //cout<<"inside relational\n"; 
+                cout<<"inside relational\n"; 
                 string key = toBeEvaluated.pop(); //first pop key, second pop field name
                 //cout<<"key: "<<key<<endl; 
                 string field = toBeEvaluated.pop(); 
                 //cout<<"field: "<<field<<endl; 
                 vector<long> receivedNums = eval(field, tokVal, key); //popped at this point should be the operator
-                //cout<<"recs: "; 
-                //printVec(receivedNums); 
+                cout<<"recs: "; 
+                printVec(receivedNums); 
                 recNums.push(receivedNums); 
                 
                 //then send it into evaluate
@@ -343,12 +347,12 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
         }
         else if(type == LOGICAL_TYPE){
             if(!recNums.empty()){
-               // cout<<"inside logical\n"; 
+                cout<<"inside logical\n"; 
                 vector<long> left = recNums.pop(); 
                 vector<long> right = recNums.pop(); 
                 vector<long> received = eval(left, tokVal, right);
-                //cout<<"received recs: "; 
-                //printVec(received);  
+                cout<<"received recs: "; 
+                printVec(received);  
                 recNums.push(received); 
                 //then do the intersect or combine for logcial  evals
             }

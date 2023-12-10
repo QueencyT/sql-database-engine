@@ -97,10 +97,11 @@ Queue<Token*> ShuntingYard::postfix(Queue<Token*> inFix){
         //cout<<"popped: "<<*popped<<endl; 
         
         if(popped->getToken() == ")" || popped->getToken() == "("){
+            //cout<<"precedence: "<<static_cast<Operator*>(popped)->getPrecedence()<<endl; 
             parenDecider(popped, numbers,operators); 
         }
         else if(popped->getType() == RELATIONAL_TYPE || popped->getType() == LOGICAL_TYPE){ 
-           // cout<<"precedence: "<<static_cast<Operator*>(popped)->getType()<<endl; 
+           //cout<<"precedence: "<<static_cast<Operator*>(popped)->getPrecedence()<<endl; 
             operatorDecider(popped, numbers, operators);  
         }
         else{

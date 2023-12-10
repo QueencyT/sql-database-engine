@@ -141,16 +141,6 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
   }
 
   if(debug){
-        /*
-    //----- student table ----------
-    make table student fields fname, lname,
-    major, age
-    insert into student values Flo, Yao, CS,20
-    insert into student values "Flo", "Jackson", Math,21
-    insert into student values Calvin, Woo, Physics,22
-    insert into student values "Anna Grace", "Del Rio", CS, 22
-    select * from student
-    */
     string s1 = "make table student fields fname, lname, major, age"; 
     string s2 = "insert into student values Flo, Yao, CS, 20"; 
     string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
@@ -162,12 +152,6 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     commands.push_back(s3); 
     commands.push_back(s4); 
     commands.push_back(s5); 
-
-    //and 
-    //or 
-    //or and
-    //or and or 
-    //and or and
 
     /*
     0                      Flo                      Yao                       CS                       20
@@ -196,59 +180,26 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    command = "select * from student where fname = Flo or major = CS and age <= 23"; 
+    command = "select * from student where fname = \"Flo\" or major = CS and age <= 23"; 
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    command = "select * from student where lname = Yang or major = CS and age < 23 or lname = Jackson"; 
+    command = "select * from student where lname = \"Yang\" or major = CS and age < 23 or lname = Jackson"; 
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos();
 
 
-    command = "select * from student where age <30 and major = CS or major = Physics and lname = Jackson"; //this is working
-    //del rio, yao 
-    //age 30 < major CS = and major Physics = lname Jackson = and or --> should be postfix im guessing
+    command = "select * from student where age <30 and major = CS or major = Physics and lname = Jackson"; 
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    //age <30 and major=CS or major = Physics and lname = Jackson
-    //age 30 < major CS = and major Physics = or lname Jackson = 
-    //
-    //maybe and and or needs different precs
-    // or < and prec?? 
-
-    //age <30 and major=CS or major = Physics and lname = Jackson
-    //age 30 < major CS = and major Physics = lname Jackson = and or
-
-
-
-
-    //2 + 3 * 3 + 5 / 4 + 8 * 10 + 11
-    //2 3 + 3 5 + * 4 8 + / 10 11 +
-
-    //
-    //age 30 > major Art = and major Physics = or lname Woo = and
-    //hmm
-
-
-
-    //[and]
-    //[1] [2,0,3]
-
-    //[age] [30] [>] [major] [Art] [=] [and] [major] [Physics] [=] [or] [lname] [Woo] [=] [and]
-
-    command = "select * from student where age > 30 and major=Art or major = Physics and lname = Woo"; //this is not working
-    //del rio, yao 
-    //age 30 < major CS = and major Physics = lname Jackson = and or --> should be postfix im guessing
+    command = "select * from student where age > 30 and major=Art or major = Physics and lname = Woo"; 
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
-
-   
-
   }
 }
 
@@ -259,26 +210,104 @@ bool test_parentheses(bool debug){
     string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
     string s4 = "insert into student values Calvin, Woo, Physics,22"; 
     string s5 = "insert into student values \"Anna Grace\", \"Del Rio\", CS, 22"; 
+    string s6 = "insert into student values \"Anna Kat\", \"The Bat\", Art, 33"; 
+    string s7 = "insert into student values Lilli, Sutton, Communications, 34"; 
+    string s8 = "insert into student values Oliver, Knox, Math, 25"; 
+
     vector<string> commands; 
     commands.push_back(s1);  
+
+    //insertions
     commands.push_back(s2); 
     commands.push_back(s3); 
     commands.push_back(s4); 
     commands.push_back(s5);
+    commands.push_back(s6); 
+    commands.push_back(s7);
+    commands.push_back(s8); 
+
+    /*
+    (.     ) and (.      ) or (.     )
+    ((      ) ….) or (….)
+    */
 
     SQL sql; 
     for(int i = 0; i < commands.size(); i++){
       sql.command(commands[i]); 
     }
+
     cout<<"full table\n"; 
     cout<<sql.command("select * from student")<<endl; 
-
 
     string command; 
     command = "select * from student where age <30 and ((major = CS or major = Physics) and (lname < Y))";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
+
+    command = "select * from student where (fname = \"Anna Grace\" and lname = \"Del Rio\")) or (age >= 22))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+
+    //professor tests
+    command = "select * from student where (age <30 and age > 20) and ((major = CS or major = Physics) or (lname < M))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where ((age <30 and age > 20) and major = Communications) or ((major = CS or major = Physics))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= H))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where age < 25 or (age > 20 and major = Communications)";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where (age < 25 or age > 20) and major = Communications"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where (age < 25 and age > 20) and major = Communications"; //will give non-existent
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= N))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where (age < 25 and age > 20) and (lname > D and lname <= N) or (major = Communications)";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+    command = "select * from student where (age < 25 and age > 20) and (lname > D and lname <= N) or (major = Math)";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+    //
+    //0 2 
+    //A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+    /*
+    0               Anna Grace                  Del Rio                       CS                       22
+    1                 Anna Kat                  The Bat                      Art                       33
+    2                   Calvin                      Woo                  Physics                       22
+    3                      Flo                      Yao                       CS                       20
+    4                      Flo                  Jackson                     Math                       21
+    5                    Lilli                   Sutton           Communications                       34
+    6                   Oliver                     Knox                     Math                       25*/
 
   }
 }

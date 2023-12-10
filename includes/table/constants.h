@@ -11,8 +11,8 @@ const int RELATIONAL_PRECEDENCE = 20;
 //const int LOGICAL_PRECEDENCE = 10; 
 const int LOGICAL_AND_PRECEDENCE = 15; 
 const int LOGICAL_OR_PRECEDENCE = 10; 
-const int LEFT_PAREN_PRECEDENCE = 0; 
-const int RIGHT_PAREN_PRECEDENCE = 30; 
+const int LEFT_PAREN_PRECEDENCE = 0; //(
+const int RIGHT_PAREN_PRECEDENCE = 30; //)
 
 
 

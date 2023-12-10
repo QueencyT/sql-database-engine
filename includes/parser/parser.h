@@ -155,11 +155,14 @@ void Parser::getTokens(){//gets the tokens without punc, and pushes it into toke
     string tokVal; 
     tokenizer >> tokVal;
     while(tokenizer.more()){  
-        if(!tokVal.empty())
-          tokens.push_back(tokVal); 
+        if(!tokVal.empty()){
+            tokens.push_back(tokVal); 
+            //cout<<"pushing back: |"<<tokVal<<"|"<<endl; 
+        }
+          
         tokenizer >> tokVal; //has the period 
     }
-    //printTokens(tokens); 
+   //printTokens(tokens); 
 }
 
 
@@ -169,11 +172,15 @@ MMap<string,string> Parser::parse_tree(){
     string val;
     MMap<string,string> returnThis; 
 
+    //select * from student where lname = Yang or major = CS and age < 23 or lname = Jackson
+
+    //printTokens(tokens); //when I do print it, suddenly there is space 
+
     if(isKeyword(tokens[0]))
         currState = keywordMap.get(tokens[0]);
 
     for(int i = 0; i < tokens.size() && currState != -1; i++){
-        //cout<<"tokens: "<<tokens[i]<<" curr state: "<<currState<<endl;  
+        //cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
         if(i < tokens.size() - 1)
               nextState = getNextState(tokens[i+1]);  
 
@@ -203,12 +210,15 @@ MMap<string,string> Parser::parse_tree(){
     returnThis = ptree;
     ptree.clear();
     tokens.clear();
+    //cout<<"return this\n"; 
+   // cout<<returnThis<<endl; 
+
     return returnThis; 
 }//if we fail, reset ptree, reset everything, 
 
 void Parser::printTokens(vector<string> toks){
     for(int i = 0; i < toks.size(); i++){
-      cout<<"token "<<i<<": "<<toks[i]<<endl; 
+      cout<<"token "<<i<<": |"<<toks[i]<<"|"<<endl; 
     }
 }
 
