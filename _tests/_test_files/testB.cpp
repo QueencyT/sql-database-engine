@@ -12,7 +12,7 @@ using namespace std;
 
 
 bool test_relational(bool debug){ //working so far 
-  if(debug){
+  if(false){
     vector<string> condition; 
     vector<string> fields = {"fname", "lname", "age", "bounty", "devilfruit"}; 
     Table mTable("one_piece_chars", fields); 
@@ -70,6 +70,104 @@ bool test_relational(bool debug){ //working so far
     cout<<mTable.select(fields, condition)<<endl; 
     cout<<"recnos: "<<endl; 
     mTable.select_recnos(); 
+  }
+
+  if(debug){
+    string s1 = "make table student fields fname, lname, major, age"; 
+    string s2 = "insert into student values Flo, Yao, CS, 20"; 
+    string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
+    string s4 = "insert into student values Calvin, Woo, Physics,22"; 
+    string s5 = "insert into student values \"Anna Grace\", \"Del Rio\", CS, 22"; 
+    vector<string> commands; 
+    commands.push_back(s1);  
+    commands.push_back(s2); 
+    commands.push_back(s3); 
+    commands.push_back(s4); 
+    commands.push_back(s5); 
+
+    SQL sql; 
+    for(int i = 0; i < commands.size(); i++){
+      sql.command(commands[i]); 
+    }
+
+    string command = "select * from student"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where lname = \"Del Rio\""; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where lname = \"Does Not Exist\""; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+    command = "select * from student where lname > Yang"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+
+    cout<<"--------------------------------------- GREATER THAN --------------------------------\n"; 
+
+    command = "select * from student where age > 50"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+    command = "select * from student where age > 53"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+
+    command = "select * from student where age > 54"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+    cout<<"--------------------------------------- GREATER THAN EQUAL --------------------------------\n"; 
+
+
+    command = "select * from student where lname >= Yang"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+
+    /*command = "select * from student where last >= Jack"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();*/
+
+    cout<<"--------------------------------------- LESS THAN --------------------------------\n"; 
+
+    command = "select * from student where lname < Jackson"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+    command = "select * from student where age < 20"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+    command = "select * from student where age < 19"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+    cout<<"--------------------------------------- LESS THAN EQUAL --------------------------------\n"; 
+
+    command = "select * from student where lname <= Smith"; 
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+
   }
 }
 
@@ -204,8 +302,7 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
 }
 
 bool test_parentheses(bool debug){
-  if(debug){
-    string s1 = "make table student fields fname, lname, major, age"; 
+  string s1 = "make table student fields fname, lname, major, age"; 
     string s2 = "insert into student values Flo, Yao, CS, 20"; 
     string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
     string s4 = "insert into student values Calvin, Woo, Physics,22"; 
@@ -213,6 +310,8 @@ bool test_parentheses(bool debug){
     string s6 = "insert into student values \"Anna Kat\", \"The Bat\", Art, 33"; 
     string s7 = "insert into student values Lilli, Sutton, Communications, 34"; 
     string s8 = "insert into student values Oliver, Knox, Math, 25"; 
+    string s9 = "insert into student values Johnathan, Salinas, Biology, 18";
+    string s10 = "insert into student values Justin, Wang, 19"; 
 
     vector<string> commands; 
     commands.push_back(s1);  
@@ -226,16 +325,12 @@ bool test_parentheses(bool debug){
     commands.push_back(s7);
     commands.push_back(s8); 
 
-    /*
-    (.     ) and (.      ) or (.     )
-    ((      ) ….) or (….)
-    */
-
     SQL sql; 
     for(int i = 0; i < commands.size(); i++){
       sql.command(commands[i]); 
     }
 
+  if(debug){
     cout<<"full table\n"; 
     cout<<sql.command("select * from student")<<endl; 
 
@@ -292,10 +387,41 @@ bool test_parentheses(bool debug){
     cout<<sql.command(command)<<endl; 
     sql.select_recnos();
 
-    command = "select * from student where (age < 25 and age > 20) and (lname > D and lname <= N) or (major = Math)";
+    command = "select * from student where (age < 25 and age > 20) and (lname > J) or (major = Math)";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos();
+
+    command = "select * from student where ((age < 20 and age > 30)) and ((major = Art) or (major = Math))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+
+    //((age < 20 and age > 30)) and ((major = Art) or (major = Math)) 
+    //age 30 < age 30 > and major Art = and
+    //= ( ( and
+
+
+    /*
+    command = "select * from student where ((age < 20 and age > 30) and (major = Art or major = Math))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+    */
+
+
+    //((age < 20 and age > 30)) and ((major = Art) or (major = Math))
+    //age 20 < age 30 > and major Art = and 
+    //( or
+      //left paren prec --> 0
+      //logical prec < relational prec 
+      //pop while popped prec < top 
+
+    //((age < 20 and age > 30) and (major = Art or major = Math))
+    //age 20 < age 30 > and major Art = major Math = or and
+    //
+    
+    //select * from student where lname>J and (major=CS or major=Art)
 
     //
     //0 2 
@@ -309,6 +435,24 @@ bool test_parentheses(bool debug){
     5                    Lilli                   Sutton           Communications                       34
     6                   Oliver                     Knox                     Math                       25*/
 
+  }
+
+  if(false){
+    string command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= N))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); 
+
+  }
+}
+
+bool testTokenize(bool debug){
+  if(debug){
+    STokenizer tokenizer; 
+    tokenizer.set_string("\"Teresae Mae\""); 
+    string val; 
+    tokenizer >> val; 
+    cout<<"val: "<<val<<endl; 
   }
 }
 
@@ -360,6 +504,10 @@ TEST(TEST_COMBINE, testCombine){
 
 TEST(TEST_PARENTHESES, testParen){
   EXPECT_EQ(1, test_parentheses(true)); 
+}
+
+TEST(TEST_TOKENIZE, testTokenize){
+  EXPECT_EQ(1, testTokenize(false)); 
 }
 bool test_stub(bool debug = false)
 {

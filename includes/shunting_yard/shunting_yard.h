@@ -61,7 +61,18 @@ void printStack(const Stack<Token*>& someStack){
 void ShuntingYard::parenDecider(Token* popped, Queue<Token*>& symbols, Stack<Token*>& operators){
     string tokVal = popped->getToken(); 
     if(tokVal == ")"){
-        popRest(symbols, operators); 
+        //cout<<"right paren:\n"; 
+        Token* op = popped; 
+        while(!operators.empty() && op->getToken() != "("){
+            //cout<<"popping: "<<op->getToken()<<endl; 
+            op = operators.pop(); 
+            if(op->getToken() != "(")
+                symbols.push(op);  
+           // cout<<"ops: "; 
+           // printStack(operators); 
+        }
+       // operators.pop(); //getting left paren left on stack 
+        //popRest(symbols, operators); 
     }
     else{
         operators.push(popped);
@@ -89,27 +100,38 @@ void ShuntingYard::popRest(Queue<Token*>& output, Stack<Token*>& operators){
 //age < 30 and major = CS or major = Physics and lname = Jack
 //age 30 < major CS = major Physics = lname Jack = and or and
 
+
+// age <30 and ((major = CS or major = Physics) and (lname < Y))
+//age 30 < major CS = major Physics = or and lname Y <
+//) and 
+
 Queue<Token*> ShuntingYard::postfix(Queue<Token*> inFix){
     Queue<Token*> numbers;
-    Stack<Token*> operators; 
+    Stack<Token*> operators;
+    //cout<<"infix: "<<endl; 
+    //printQueue(infix);  
     while(!inFix.empty()){
         Token* popped = inFix.pop(); 
-        //cout<<"popped: "<<*popped<<endl; 
+       // cout<<"popped infix: "<<*popped<<endl; 
+       // cout<<"postfix: "<<endl; 
+       // printQueue(numbers); 
+       // cout<<"ops: "; 
+       // printStack(operators);
         
         if(popped->getToken() == ")" || popped->getToken() == "("){
             //cout<<"precedence: "<<static_cast<Operator*>(popped)->getPrecedence()<<endl; 
             parenDecider(popped, numbers,operators); 
         }
         else if(popped->getType() == RELATIONAL_TYPE || popped->getType() == LOGICAL_TYPE){ 
-           //cout<<"precedence: "<<static_cast<Operator*>(popped)->getPrecedence()<<endl; 
+          // cout<<"precedence: "<<static_cast<Operator*>(popped)->getPrecedence()<<endl; 
             operatorDecider(popped, numbers, operators);  
         }
         else{
             numbers.push(popped); 
         }
-        cout<<endl; 
 
     }
+    //cout<<"here\n"; 
     popRest(numbers, operators);  
     return numbers; 
 }
@@ -119,8 +141,9 @@ void ShuntingYard::operatorDecider(Token* popped, Queue<Token*>& symbols, Stack<
      int precedence = static_cast<Operator*>(popped)->getPrecedence();
 
      //while operators stack not empty and the precedence of the popped operator is lower than the precednece of the operator on the stack 
-    while(!operators.empty() && precedence <= static_cast<Operator*>((operators.top()))->getPrecedence()){
+    while(!operators.empty() && precedence <= static_cast<Operator*>((operators.top()))->getPrecedence()){//was <= 
         stackOp = operators.pop(); 
+       // cout<<"popped op: "<<stackOp->getToken()<<endl; 
         symbols.push(stackOp); //add to output 
     }
     operators.push(popped); //push the popped op onto stack now in correct place 
