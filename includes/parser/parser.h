@@ -17,24 +17,54 @@ class Parser{
         string expression; 
         vector<string> tokens; 
         Map<string, int> keywordMap; 
-        int stateMachine[MAX_ROWS][MAX_COLUMNS];  
-        MMap<string,string> ptree; 
+        int stateMachine[MAX_ROWS][MAX_COLUMNS]; //for now 
+        MMap<string,string> ptree; //building the ptree
 
-        void printTokens(vector<string> toks); //helper function just to print tokens
+        
+        void printTokens(vector<string> toks); 
         void makeTable();
         void initKeywords(); 
 
-        //boolean helper functions --> tells us information about what state we are in 
-        bool isCommandState(int state){ return COMMAND_STATES[state];}
-        bool isTableNameState(int state){return TABLE_NAME_STATES[state];}
-        bool isWhereState(int state){return WHERE_STATE[state];}
-        bool isValueState(int state){return VALUES_STATE[state];}
-        bool isConditionState(int state){return CONDITION_STATE[state];}
-        bool isFieldNameState(int state){return FIELD_NAME_STATE[state];}
-        bool isKeyword(string token){return keywordMap.contains(token);}
-        bool isColState(int state){return COL_STATE[state];}
-        //helper function tell us which state to go to next
-        int getNextState(string tok); 
+        bool isCommandState(int state){
+            return COMMAND_STATES[state]; 
+        }
+
+        bool isTableNameState(int state){
+            return TABLE_NAME_STATES[state]; 
+        }
+
+        bool isWhereState(int state){
+            return WHERE_STATE[state]; 
+        }
+
+        bool isValueState(int state){
+            return VALUES_STATE[state]; 
+        }
+
+        bool isConditionState(int state){
+            return CONDITION_STATE[state]; 
+        }
+
+        bool isFieldNameState(int state){
+            return FIELD_NAME_STATE[state]; 
+        }
+
+        bool isKeyword(string token){
+            return keywordMap.contains(token); 
+        }
+
+        bool isColState(int state){
+            return COL_STATE[state]; 
+        }
+
+        int getNextState(string token){
+            if(isKeyword(token)){
+                return keywordMap.get(token); 
+            }
+            else{//is a symbol so return val for symbol
+                return SYMBOL; 
+            }
+        }
 }; 
 
 
@@ -73,6 +103,9 @@ void Parser::makeTable(){
     //state 0 - start state 
     //state 1 - MAKE state - command state
     //state 2 - TABLE state - command state 
+    //state 3 - 
+
+    //......... 
 
     //select stateMachine path 
     mark_cell(0,stateMachine,SELECT, 11);  
@@ -111,6 +144,7 @@ void Parser::set_string(string s){
 }
 
 void Parser::getTokens(){//gets the tokens without punc, and pushes it into tokens
+    //cout<<"exp: "<<expression<<endl; 
     char exp[expression.length() + 1]; 
     strcpy(exp, expression.c_str()); 
     STokenizer tokenizer(exp);  
@@ -121,19 +155,22 @@ void Parser::getTokens(){//gets the tokens without punc, and pushes it into toke
             tokens.push_back(tokVal);  
         }
           
-        tokenizer >> tokVal; 
+        tokenizer >> tokVal; //has the period 
     }
+    //printTokens(tokens); 
 }
 
 MMap<string,string> Parser::parse_tree(){
-    int currState = 0, nextState = 0, i; 
+    int currState = 0, nextState = 0; 
     string val;
     MMap<string,string> returnThis; 
 
     if(isKeyword(tokens[0]))
         currState = keywordMap.get(tokens[0]);
+    
 
-    for(i = 0; i < tokens.size() && currState != -1; i++){
+    for(int i = 0; i < tokens.size() && currState != -1; i++){
+        cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
         if(i < tokens.size() - 1)
               nextState = getNextState(tokens[i+1]);  
 
@@ -160,15 +197,9 @@ MMap<string,string> Parser::parse_tree(){
         }
         currState = stateMachine[currState][nextState]; //from currState we got this newState where will we go
     }
-    
-    //cout<<"end state: "<<currState<<endl; 
-   //if(currState == -1){
-      // cout<<"FAILED: INCORRECT SYNTAX FOUND: "<< tokens[i]<<endl; 
-       //ptree.clear(); 
-   // }
     returnThis = ptree;
-    tokens.clear();
     ptree.clear();
+    tokens.clear();
     return returnThis; 
 }//if we fail, reset ptree, reset everything, 
 
@@ -178,12 +209,7 @@ void Parser::printTokens(vector<string> toks){
     }
 }
 
-int Parser::getNextState(string token){
-    if(isKeyword(token)){
-        return keywordMap.get(token); 
-    }
-    else{//is a symbol so return val for symbol
-        return SYMBOL; 
-    }
-}
+//repushing comment
+
+
 #endif 

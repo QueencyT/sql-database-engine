@@ -38,8 +38,7 @@ vector<long> SQL::select_recnos(){
 Table SQL::command(string com){
     parser.set_string(com); 
     statementTree = parser.parse_tree(); 
-
-    string command = statementTree.get("command")[0]; //will always have a table name and some sort of command
+    string command = statementTree.get("command")[0]; //will always have a t
     string tableName = statementTree.get("table_name")[0];
     Table returnTable; 
 
@@ -75,16 +74,20 @@ Table SQL::selectCommand(string tableName){
     allFields = mTable.getFields(); 
 
     if(selectAll() && !hasCondition()){
+        cout<<"select all with no condition\n"; 
         return mTable.select_all(allFields);  
     }
     else if(selectAll() && hasCondition()){
+        cout<<"select all with condition\n"; 
         vector<string> condition = statementTree.get("condition"); 
         return mTable.select(allFields, condition);
     }
     else if(!selectAll() && !hasCondition()){
+        cout<<"regular select with no condition\n"; 
         return mTable.select_all(fields); 
     }
     else{//if not select all and has a condition
+        cout<<"regular select with condition\n"; 
         vector<string> condition = statementTree.get("condition");
         return mTable.select(fields, condition); 
     }
