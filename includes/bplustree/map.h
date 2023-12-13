@@ -76,9 +76,7 @@ public:
     }
 
     V& at(const K& key){
-        //we want BPlusTree<Pair<K, V>>::Iterator
         Pair<K,V> getThis(key); 
-        //Pair<K,V> foundPair = 
         return map.get_existing(getThis).value; 
         
     }
@@ -107,7 +105,6 @@ public:
     }
 
     V get(const K& key){
-         //we want BPlusTree<Pair<K, V>>::Iterator
         Pair<K,V> found = map.get(key); 
         return found.value; 
     }
@@ -121,7 +118,6 @@ public:
         return map.contains(target); 
     }
 
-    // I have not writtent hese yet, but we will need them:
     int count(const K& key){
         return 0; 
     }
@@ -138,11 +134,7 @@ public:
         return mIter; 
     }
 
-
-    //    equal_range: //what is this? 
-
     bool is_valid(){
-       // return map.is_valid();
        return true; 
     }
 

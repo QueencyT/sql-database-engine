@@ -16,11 +16,9 @@ class Logical : public Operator{
 
 Logical::Logical(string logicalOp) : Operator(LOGICAL_TYPE, logicalOp){ //MODIFIED, was LOGICAL_PRECEDENCE being passed in befroe 
     if(getToken() == "and"){
-       // cout<<"setting and precedence\n"; 
         setPrecedence(LOGICAL_AND_PRECEDENCE);  
     }
     if(getToken() == "or"){
-        //cout<<"setting or precedence\n"; 
         setPrecedence(LOGICAL_OR_PRECEDENCE); 
     }    
 }
