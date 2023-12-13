@@ -162,10 +162,10 @@ MMap<string,string> Parser::parse_tree(){
     }
     
     //cout<<"end state: "<<currState<<endl; 
-   if(currState == -1){
-       cout<<"FAILED: INCORRECT SYNTAX FOUND: "<< tokens[i]<<endl; 
+   //if(currState == -1){
+      // cout<<"FAILED: INCORRECT SYNTAX FOUND: "<< tokens[i]<<endl; 
        //ptree.clear(); 
-    }
+   // }
     returnThis = ptree;
     tokens.clear();
     ptree.clear();

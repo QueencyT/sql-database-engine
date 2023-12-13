@@ -35,11 +35,11 @@ class Table{
 
         void insert_into(vector<string> data);
 
-        Table select(vector<string> fields, Queue<Token*> postFix); //post fix table 
+        Table select(vector<string> fields, Queue<Token*> postFix); //select that takes in a post fix queue
         Table select(vector<string> fields, string field, string op, string key); 
         Table select(vector<string> fields, vector<string> infixCondition); 
         Table select_all(); 
-        Table select_all(vector<string> fields); //return table?
+        Table select_all(vector<string> fields); 
         string getTableName(); 
         vector<string> getFields(); 
 
@@ -60,10 +60,6 @@ class Table{
             outs<<endl; 
             return outs; 
         }
-
-        //logical eval functions  //public for now
-        vector<long> combine(vector<long> left, vector<long> right);
-        vector<long> intersection(vector<long> left, vector<long> right);
        
     private: 
         vector<MMap<string,long>> mTable; //each index represents a 
@@ -83,8 +79,8 @@ class Table{
         vector<long> eval(string field, string op, string key);//for logical
 
         vector<long> iterate(MMap<string, long>::Iterator start, MMap<string, long>::Iterator end);
-
-        
+        vector<long> combine(vector<long> left, vector<long> right);
+        vector<long> intersection(vector<long> left, vector<long> right);
 
         vector<string> printFields(vector<string> f){
         for(int i = 0; i < f.size(); i++){
@@ -127,7 +123,7 @@ void Table::buildIndexes(vector<string> fields){
 
 Table::Table(){
     fstream aFile; 
-    open_fileW(aFile, "temp.bin"); //opening file //still havent done anything with field names
+    open_fileW(aFile, "temp.bin");
     serial++; 
 }
 
@@ -206,12 +202,12 @@ vector<long> Table::eval(string field, string op, string key){
     MMap<string, long>::Iterator beg = mTable[index].begin(), end = mTable[index].end(), upBound = mTable[index].upper_bound(key),
     lowBound = mTable[index].lower_bound(key);
 
-    if(op == "="){ //maybe abstract out into operator class --> and the function will 
+    if(op == "="){ 
         recnos = mTable[index].get(key); 
     }else if(op == ">"){
         recnos = iterate(upBound, end); 
     }else if(op == "<"){
-        recnos = iterate(beg, lowBound); //lowerbound will get == or > // but will stop before then
+        recnos = iterate(beg, lowBound); 
     }else if(op == ">="){
         recnos = iterate(lowBound, end); 
     }else if(op == "<="){
@@ -221,10 +217,10 @@ vector<long> Table::eval(string field, string op, string key){
         if(lowBound != mTable[index].end() && low.key == key){
             MMap<string,long>::Iterator next = lowBound++;
             recnos = iterate(beg, next); 
-            }
-            else{//before there was no else just if //// recnos = knd
+        }
+        else{
             recnos = iterate(beg, lowBound); 
-            }
+        }
     }else{
         cout<<"INVALID OPERAND TYPE\n"; 
     }
