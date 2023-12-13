@@ -13,9 +13,7 @@ class Token{
         Token(int typeVal);
         Token(int typeVal, string tokVal); 
         int getType(); 
-        string getToken(); 
-
-        //function used in select to quicky create a Queue of tokens when given a vector of strings 
+        string getToken();
         Queue<Token*> createTokens(vector<string> tokVals);  
         friend ostream& operator <<(ostream& outs, const Token& printMe){
             outs<<printMe.tok; 
@@ -28,7 +26,7 @@ class Token{
         Map<string,int> relationalTypes; //a map of relational operators, a map of logical operators, a map of 
         Map<string,int> logicalTypes; 
         void init_token_types(); 
-        Token* createToken(string tokVal); //helper function, helps createTokens create tokens
+        Token* createToken(string tokVal); 
         
 }; 
 
@@ -38,6 +36,9 @@ class Token{
 #include "../../includes/tokenTypes/Relational.h"
 #include "../../includes/tokenTypes/TokenStr.h"
 #include "../../includes/tokenTypes/Paren.h"
+
+//operator, not operator, paren
+
 
 void Token::init_token_types(){
     relationalTypes.insert(">=", RELATIONAL_TYPE); 
@@ -53,6 +54,7 @@ void Token::init_token_types(){
 Token* Token::createToken(string tokVal){
     if(relationalTypes.contains(tokVal)){
        return (new Relational(tokVal)); 
+
     }
     else if(logicalTypes.contains(tokVal)){
         return (new Logical(tokVal)); 

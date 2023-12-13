@@ -29,8 +29,8 @@ const int TOKEN_END = -2;
 //index -> states --> values TokenTypes
 const int SUCCESS_STATES[] = {-1, TOKEN_ALPHA, TOKEN_NUMBER,-1, -1, TOKEN_SPACE, TOKEN_PUNC}; 
 
-//arrays denoting what type of state it is, 
-const int COMMAND_STATES[] = {0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0}; //command states = 1,6 hence the 1 values
+//must recheck these to make sure 
+const int COMMAND_STATES[] = {0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0}; 
 const int TABLE_NAME_STATES[] = {0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0};
 const int WHERE_STATE[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}; 
 const int VALUES_STATE[] = {0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}; 

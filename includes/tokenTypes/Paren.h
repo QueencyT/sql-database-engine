@@ -27,7 +27,7 @@ Paren::Paren(string par) : Operator(PAREN_TYPE, par){
         setPrecedence(RIGHT_PAREN_PRECEDENCE);
     }
     else{
-        cout<<"INVALID: NOT A PARENTHESES\n";
+        //cout<<"INVALID: NOT A PARENTHESES\n";
     } 
 }
 //right paren, left paren
