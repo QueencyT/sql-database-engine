@@ -94,12 +94,13 @@ long FileRecord::write(fstream& mFile){
 
     std::streampos byteSize = mFile.tellg(); 
     recNum = byteSize / (MAX_ROWS * (MAX_COLS + 1)); //recNum--; //at its very least it will be one skewing evrything
-    recNum--;
+    recNum--; //decrement so recs start from 0 
     return recNum; 
     //writes the record into file and increment record num 
 } //returns the record number
 
 long FileRecord::read(fstream& mFile, long recno){ //constraint assumption --> recno starts from 0 
+    //mFile.seekg((recno - 1) * (MAX_ROWS * (MAX_COLS + 1))); 
     mFile.seekg((recno) * (MAX_ROWS * (MAX_COLS + 1))); 
     int pos = mFile.tellg(); 
 

@@ -143,6 +143,7 @@ Table::Table(const char fileName[]){
     recordReader.read(savedInfo, 0); //reading the saved info 
     vector<string> savedFields = recordReader.get_record(); 
     buildIndexes(savedFields);
+   // cout<<"ctor fired\n"; 
     fields = savedFields; 
     initTable(aFile); 
 
@@ -215,16 +216,19 @@ vector<long> Table::eval(string field, string op, string key){
     }else if(op == ">="){
         recnos = iterate(lowBound, end); 
     }else if(op == "<="){
+       // cout<<"op: "<<op<<endl; 
         MPair<string, long> low; 
         if(lowBound != mTable[index].end())
             low = *lowBound; 
-        if(lowBound != mTable[index].end() && low.key == key){
-            MMap<string,long>::Iterator next = lowBound++;
-            recnos = iterate(beg, next); 
-            }
-            else{//before there was no else just if //// recnos = knd
-            recnos = iterate(beg, lowBound); 
-            }
+       //cout<<"key: "<<key<<endl; 
+      // cout<<"low key: "<<low.key<<endl; 
+       if(lowBound != mTable[index].end() && low.key == key){
+        MMap<string,long>::Iterator next = lowBound++;
+        recnos = iterate(beg, next); 
+       }
+       else{//before there was no else just if //// recnos = knd
+        recnos = iterate(beg, lowBound); 
+       }
     }else{
         cout<<"INVALID OPERAND TYPE\n"; 
     }
@@ -280,6 +284,10 @@ vector<long> Table::eval(vector<long> left, string op, vector<long> right){//for
     return recnos; 
 }
 
+//age, 20, <, age, 17, >, and, lname, Gomex, =, or
+//relational --> works with vectors --> gives combined or intersected vectors 
+//logical --> works with strings --> gives vec 
+
 vector<long> Table::select_recnos(){
     printVec(selectedVec); 
     return selectedVec; 
@@ -308,6 +316,15 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
     Stack<string> toBeEvaluated; 
     Stack<vector<long>> recNums; 
     vector<long> mVec; 
+
+    /*cout<<"MAP\n"; 
+    cout<<mTable[1]<<endl; 
+
+    cout<<"TABLE IN SELECT\n"; 
+    cout<<*this<<endl;
+    cout<<"---------------------\n";*/ 
+
+    
     
     //result vec
     //when evaluated, a vector of recnos will be returned.... 
@@ -315,21 +332,35 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
         Token* popped = postFix.pop(); 
         int type = popped->getType(); 
         string tokVal = popped->getToken(); 
+        //cout<<"popped: "<<tokVal<<endl; 
+        //cout<<"post fix stack: "; 
+       // printQueue(postFix); 
 
         if(type == RELATIONAL_TYPE){//relational, logical
             if(!toBeEvaluated.empty()){ //prob won't be empty 
+                //cout<<"inside relational\n"; 
                 string key = toBeEvaluated.pop(); //first pop key, second pop field name
+                //cout<<"key: "<<key<<endl; 
                 string field = toBeEvaluated.pop(); 
+                //cout<<"field: "<<field<<endl; 
                 vector<long> receivedNums = eval(field, tokVal, key); //popped at this point should be the operator
+                //cout<<"recs: "; 
+                //printVec(receivedNums); 
                 recNums.push(receivedNums); 
+                
+                //then send it into evaluate
             }
         }
         else if(type == LOGICAL_TYPE){
             if(!recNums.empty()){
+                //cout<<"inside logical\n"; 
                 vector<long> left = recNums.pop(); 
                 vector<long> right = recNums.pop(); 
                 vector<long> received = eval(left, tokVal, right);
+                //cout<<"received recs: "; 
+                //printVec(received);  
                 recNums.push(received); 
+                //then do the intersect or combine for logcial  evals
             }
         }
         else{//a regualr expession
@@ -341,6 +372,13 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
     selectedVec = res; 
     Table returnTable = vector_to_table(fields, res);
     return returnTable; 
+
+    //2 0
+
+    //2 and 0
+
+
+    
 }
 
 
@@ -390,6 +428,7 @@ Table Table::select_all(){
 }
 
 Table Table::select_all(vector<string> fields){ 
+    //cout<<"inside select all\n"; 
     vector<long> recs; 
     for(MMap<string,long>::Iterator beg = mTable[0].begin(); beg != mTable[0].end(); beg++){
         MPair<string,long> received = *beg; 

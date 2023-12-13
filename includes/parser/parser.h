@@ -23,6 +23,7 @@ class Parser{
         
         void printTokens(vector<string> toks); 
         void makeTable();
+        void buildTree(); 
         void initKeywords(); 
 
         bool isCommandState(int state){
@@ -170,7 +171,7 @@ MMap<string,string> Parser::parse_tree(){
     
 
     for(int i = 0; i < tokens.size() && currState != -1; i++){
-        cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
+        //cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
         if(i < tokens.size() - 1)
               nextState = getNextState(tokens[i+1]);  
 
