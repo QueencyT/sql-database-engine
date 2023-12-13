@@ -20,8 +20,10 @@ class Parser{
         int stateMachine[MAX_ROWS][MAX_COLUMNS]; //for now 
         MMap<string,string> ptree; //building the ptree
 
+        
         void printTokens(vector<string> toks); 
         void makeTable();
+        void buildTree(); 
         void initKeywords(); 
 
         bool isCommandState(int state){
@@ -102,6 +104,9 @@ void Parser::makeTable(){
     //state 0 - start state 
     //state 1 - MAKE state - command state
     //state 2 - TABLE state - command state 
+    //state 3 - 
+
+    //......... 
 
     //select stateMachine path 
     mark_cell(0,stateMachine,SELECT, 11);  
@@ -120,6 +125,7 @@ void Parser::makeTable(){
     mark_cell(0,stateMachine,MAKE,1); 
     mark_cell(1,stateMachine,TABLE,2); 
     mark_cell(2,stateMachine,SYMBOL,3); 
+    //mark_cell(3,stateMachine,SYMBOL,3);
     mark_cell(3,stateMachine,FIELDS, 4);
     mark_cell(4,stateMachine,SYMBOL,5); 
     mark_cell(5,stateMachine,SYMBOL,5);  
@@ -140,30 +146,41 @@ void Parser::set_string(string s){
 }
 
 void Parser::getTokens(){//gets the tokens without punc, and pushes it into tokens
+    //cout<<"exp: "<<expression<<endl; 
     char exp[expression.length() + 1]; 
     strcpy(exp, expression.c_str()); 
-    STokenizer tokenizer(exp);  
+    STokenizer tokenizer(exp); 
+    //const string newExp = expression; 
+    //tokenizer.set_string(newExp.c_str()); 
     string tokVal; 
     tokenizer >> tokVal;
     while(tokenizer.more()){  
         if(!tokVal.empty()){
-            tokens.push_back(tokVal);  
+            tokens.push_back(tokVal); 
+            //cout<<"pushing back: |"<<tokVal<<"|"<<endl; 
         }
           
         tokenizer >> tokVal; //has the period 
     }
+   //printTokens(tokens); 
 }
 
+
+
 MMap<string,string> Parser::parse_tree(){
-    int currState = 0, nextState = 0, i; 
+    int currState = 0, nextState = 0; 
     string val;
     MMap<string,string> returnThis; 
+
+    //select * from student where lname = Yang or major = CS and age < 23 or lname = Jackson
+
+    //printTokens(tokens); //when I do print it, suddenly there is space 
 
     if(isKeyword(tokens[0]))
         currState = keywordMap.get(tokens[0]);
 
-    for(i = 0; i < tokens.size() && currState != -1; i++){
-       // cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
+    for(int i = 0; i < tokens.size() && currState != -1; i++){
+        //cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
         if(i < tokens.size() - 1)
               nextState = getNextState(tokens[i+1]);  
 
@@ -190,13 +207,12 @@ MMap<string,string> Parser::parse_tree(){
         }
         currState = stateMachine[currState][nextState]; //from currState we got this newState where will we go
     }
-   // cout<<"end state: "<<currState<<endl; 
-   // if(currState == -1){
-       // cout<<"FAILED: INCORRECT SYNTAX FOUND: "<< tokens[i]<<endl; 
-   // }
     returnThis = ptree;
-    tokens.clear();
     ptree.clear();
+    tokens.clear();
+    //cout<<"return this\n"; 
+   // cout<<returnThis<<endl; 
+
     return returnThis; 
 }//if we fail, reset ptree, reset everything, 
 

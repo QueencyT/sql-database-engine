@@ -124,7 +124,6 @@ Queue<T>::~Queue(){
 
 template <typename T>
 bool Queue<T>::empty(){
-    //return (_size == 0); 
     return (_front == NULL); 
     //_front == _rear does not necessarily mean list empty, means there could be one item left and they're both pointing there
 }

@@ -38,12 +38,6 @@ vector<long> SQL::select_recnos(){
 Table SQL::command(string com){
     parser.set_string(com); 
     statementTree = parser.parse_tree(); 
-
-    /*if(statementTree.empty()){
-        Table empty; 
-        return empty; 
-    }*/
-
     string command = statementTree.get("command")[0]; //will always have a t
     string tableName = statementTree.get("table_name")[0];
     Table returnTable; 
@@ -57,6 +51,8 @@ Table SQL::command(string com){
         returnTable = selectCommand(tableName);  
     } 
 
+    //cout<<"table\n"; 
+    //cout<<returnTable<<endl; 
     return returnTable; 
 }
 

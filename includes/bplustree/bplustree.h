@@ -778,8 +778,8 @@ void BPlusTree<T>::print_tree(int level, ostream &outs) const{
             subset[i]->print_tree(level + 1, outs); //child will always be one more than data count  
         if(i!= 0){
             outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"dc: "<<data_count<<"cc: "<<child_count; //<<" a: "<<this; 
-            //if(next)
-               // outs<<"next: "<<next->data[0];  
+            if(next)
+                outs<<"next: "<<next->data[0];  
             outs<<endl; 
         }
     }

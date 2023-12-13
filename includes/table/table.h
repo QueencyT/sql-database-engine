@@ -143,6 +143,7 @@ Table::Table(const char fileName[]){
     recordReader.read(savedInfo, 0); //reading the saved info 
     vector<string> savedFields = recordReader.get_record(); 
     buildIndexes(savedFields);
+   // cout<<"ctor fired\n"; 
     fields = savedFields; 
     initTable(aFile); 
 
@@ -215,16 +216,19 @@ vector<long> Table::eval(string field, string op, string key){
     }else if(op == ">="){
         recnos = iterate(lowBound, end); 
     }else if(op == "<="){
+       // cout<<"op: "<<op<<endl; 
         MPair<string, long> low; 
         if(lowBound != mTable[index].end())
             low = *lowBound; 
-        if(lowBound != mTable[index].end() && low.key == key){
-            MMap<string,long>::Iterator next = lowBound++;
-            recnos = iterate(beg, next); 
-            }
-            else{//before there was no else just if //// recnos = knd
-            recnos = iterate(beg, lowBound); 
-            }
+       //cout<<"key: "<<key<<endl; 
+      // cout<<"low key: "<<low.key<<endl; 
+       if(lowBound != mTable[index].end() && low.key == key){
+        MMap<string,long>::Iterator next = lowBound++;
+        recnos = iterate(beg, next); 
+       }
+       else{//before there was no else just if //// recnos = knd
+        recnos = iterate(beg, lowBound); 
+       }
     }else{
         cout<<"INVALID OPERAND TYPE\n"; 
     }
@@ -313,14 +317,8 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
     Stack<vector<long>> recNums; 
     vector<long> mVec; 
 
-    /*cout<<"MAP\n"; 
-    cout<<mTable[1]<<endl; 
-
-    cout<<"TABLE IN SELECT\n"; 
-    cout<<*this<<endl;
-    cout<<"---------------------\n";*/ 
-
-    
+    //cout<<"TABLE\n"; 
+    //cout<<*this<<endl; 
     
     //result vec
     //when evaluated, a vector of recnos will be returned.... 

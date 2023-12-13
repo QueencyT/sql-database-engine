@@ -1,7 +1,5 @@
 #ifndef PAREN_H 
 #define PAREN_H 
-
-#include "../../includes/token/token.h"
 #include "../../includes/tokenTypes/Operator.h"
 #include "../../includes/table/constants.h"
 
@@ -13,7 +11,6 @@ class Paren : public Operator{
         Paren(string par); 
     private: 
 }; 
-
 
 Paren::Paren() : Operator(PAREN_TYPE){
 
@@ -27,9 +24,8 @@ Paren::Paren(string par) : Operator(PAREN_TYPE, par){
         setPrecedence(RIGHT_PAREN_PRECEDENCE);
     }
     else{
-        //cout<<"INVALID: NOT A PARENTHESES\n";
+        cout<<"INVALID: NOT A PARENTHESES\n";
     } 
 }
 //right paren, left paren
-
-#endif 
+#endif
