@@ -11,7 +11,7 @@ int main(int argv, char** argc) {
     cout << "\n\n"
          << endl;
 
-    string command;
+    /*string command;
     SQL sql1; 
 
     while(true){
@@ -22,7 +22,7 @@ int main(int argv, char** argc) {
         if(command == "exit")
             break;   
         cout<<sql1.command(command)<<endl; 
-    }
+    }*/
     
     cout << "\n\n\n=====================" << endl;
     return 0;
