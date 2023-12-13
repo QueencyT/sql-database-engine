@@ -455,7 +455,7 @@ bool test_combine(bool debug){ //combination and intersection functions are prob
 
 
 TEST(TEST_RELATIONAL, testRelational){
-  EXPECT_EQ(1, test_relational(false)); 
+  EXPECT_EQ(1, test_relational(true)); 
 }
 
 TEST(TEST_LOGICAL, testLogical){
