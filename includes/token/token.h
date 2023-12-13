@@ -19,6 +19,7 @@ class Token{
             outs<<printMe.tok; 
             return outs; 
         }
+        
     private: 
         int type; 
         string tok; 
@@ -29,10 +30,15 @@ class Token{
         
 }; 
 
+
+#include "../../includes/tokenTypes/Operator.h"
 #include "../../includes/tokenTypes/Logical.h"
 #include "../../includes/tokenTypes/Relational.h"
 #include "../../includes/tokenTypes/TokenStr.h"
 #include "../../includes/tokenTypes/Paren.h"
+
+//operator, not operator, paren
+
 
 void Token::init_token_types(){
     relationalTypes.insert(">=", RELATIONAL_TYPE); 
@@ -44,11 +50,6 @@ void Token::init_token_types(){
     logicalTypes.insert("or", LOGICAL_TYPE); 
 
 }
-
-
-//or master map --> with all valid tokens  
-
-//is relational? is logical? --> so those classes each have a map of their own //no but you'd have to instantiate a 
 
 Token* Token::createToken(string tokVal){
     if(relationalTypes.contains(tokVal)){
@@ -74,7 +75,6 @@ Queue<Token*> Token::createTokens(vector<string> tokVals){
     return result; 
 }
 
-//make an is_operator func
 
 Token::Token(){
     init_token_types();
@@ -101,8 +101,5 @@ int Token::getType(){
 string Token::getToken(){
     return tok; 
 }
-
-
-//operator, not operator, paren
 
 #endif

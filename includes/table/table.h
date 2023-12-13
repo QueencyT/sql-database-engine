@@ -11,6 +11,7 @@
 #include "../../includes/binary_files/file_record.h"
 #include "../../includes/bplustree/map.h"
 #include "../../includes/table/typedefs.h"
+#include "../../includes/tokenTypes/resultSet.h"
 
 
 #include "../../includes/queue/MyQueue.h"
@@ -143,7 +144,6 @@ Table::Table(const char fileName[]){
     recordReader.read(savedInfo, 0); //reading the saved info 
     vector<string> savedFields = recordReader.get_record(); 
     buildIndexes(savedFields);
-   // cout<<"ctor fired\n"; 
     fields = savedFields; 
     initTable(aFile); 
 
@@ -216,19 +216,16 @@ vector<long> Table::eval(string field, string op, string key){
     }else if(op == ">="){
         recnos = iterate(lowBound, end); 
     }else if(op == "<="){
-       // cout<<"op: "<<op<<endl; 
         MPair<string, long> low; 
         if(lowBound != mTable[index].end())
             low = *lowBound; 
-       //cout<<"key: "<<key<<endl; 
-      // cout<<"low key: "<<low.key<<endl; 
-       if(lowBound != mTable[index].end() && low.key == key){
-        MMap<string,long>::Iterator next = lowBound++;
-        recnos = iterate(beg, next); 
-       }
-       else{//before there was no else just if //// recnos = knd
-        recnos = iterate(beg, lowBound); 
-       }
+        if(lowBound != mTable[index].end() && low.key == key){
+            MMap<string,long>::Iterator next = lowBound++;
+            recnos = iterate(beg, next); 
+        }
+        else{//before there was no else just if //// recnos = knd
+            recnos = iterate(beg, lowBound); 
+        }
     }else{
         cout<<"INVALID OPERAND TYPE\n"; 
     }
@@ -317,52 +314,80 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
     Stack<vector<long>> recNums; 
     vector<long> mVec; 
 
-    //cout<<"TABLE\n"; 
-    //cout<<*this<<endl; 
+
+    Stack<Token*> toks; 
+
+    /*cout<<"MAP\n"; 
+    cout<<mTable[1]<<endl; 
+
+    cout<<"TABLE IN SELECT\n"; 
+    cout<<*this<<endl;
+    cout<<"---------------------\n";*/ 
+
+    
     
     //result vec
     //when evaluated, a vector of recnos will be returned.... 
     while(!postFix.empty()){
+        //cout<<"start\n"; 
         Token* popped = postFix.pop(); 
         int type = popped->getType(); 
         string tokVal = popped->getToken(); 
-        //cout<<"popped: "<<tokVal<<endl; 
+       // cout<<"popped: "<<tokVal<<endl; 
         //cout<<"post fix stack: "; 
        // printQueue(postFix); 
 
         if(type == RELATIONAL_TYPE){//relational, logical
-            if(!toBeEvaluated.empty()){ //prob won't be empty 
+            if(!toks.empty()){ //prob won't be empty 
                 //cout<<"inside relational\n"; 
-                string key = toBeEvaluated.pop(); //first pop key, second pop field name
+                //string key = toBeEvaluated.pop(); //first pop key, second pop field name WAS THIS 
+                string key = toks.pop()->getToken(); 
                 //cout<<"key: "<<key<<endl; 
-                string field = toBeEvaluated.pop(); 
+                string field = toks.pop()->getToken(); 
+                //string field = toBeEvaluated.pop(); 
                 //cout<<"field: "<<field<<endl; 
                 vector<long> receivedNums = eval(field, tokVal, key); //popped at this point should be the operator
+
+                Result_Set* resSet = new Result_Set(receivedNums);  //THIS WaS NOT HERE
                 //cout<<"recs: "; 
-                //printVec(receivedNums); 
-                recNums.push(receivedNums); 
+                //printVec(resSet->getSet()); 
+                //recNums.push(receivedNums);  //WAS THIS
+                toks.push(resSet); 
                 
                 //then send it into evaluate
             }
         }
         else if(type == LOGICAL_TYPE){
-            if(!recNums.empty()){
+            if(!toks.empty()){
                 //cout<<"inside logical\n"; 
-                vector<long> left = recNums.pop(); 
-                vector<long> right = recNums.pop(); 
-                vector<long> received = eval(left, tokVal, right);
+               // vector<long> left = recNums.pop(); 
+               // vector<long> right = recNums.pop(); 
+               vector<long> left = static_cast<Result_Set*>(toks.pop())->getSet();
+               //cout<<"pop left: "<<endl;  
+               vector<long> right = static_cast<Result_Set*>(toks.pop())->getSet(); 
+              // cout<<"pop right: "<<endl; 
+               
+               vector<long> received = eval(left, tokVal, right);
+
+               Result_Set* resSet = new Result_Set(received);  //THIS WaS NOT HERE
+
                 //cout<<"received recs: "; 
-                //printVec(received);  
-                recNums.push(received); 
+                //printVec(resSet->getSet());  
+                //recNums.push(received); //WAS THIS 
+                toks.push(resSet); 
                 //then do the intersect or combine for logcial  evals
             }
         }
         else{//a regualr expession
-            toBeEvaluated.push(tokVal); //push the string val into stack
+            //toBeEvaluated.push(tokVal); //push the string val into stack
+            toks.push(popped); //push what we just popped into the evaluate stack
+
         }
     }
 
-    vector<long> res = recNums.pop(); 
+    //vector<long> res = recNums.pop(); 
+    //selectedVec = res; 
+    vector<long> res = static_cast<Result_Set*>(toks.pop())->getSet(); 
     selectedVec = res; 
     Table returnTable = vector_to_table(fields, res);
     return returnTable; 

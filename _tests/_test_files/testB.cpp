@@ -289,7 +289,7 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     sql.select_recnos();
 
 
-    command = "select * from student where age <30 and major = CS or major = Physics and lname = Jackson"; 
+    command = "select * from student where age < 30 and major = CS or major = Physics and lname = Jackson"; 
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
@@ -311,7 +311,7 @@ bool test_parentheses(bool debug){
     string s7 = "insert into student values Lilli, Sutton, Communications, 34"; 
     string s8 = "insert into student values Oliver, Knox, Math, 25"; 
     string s9 = "insert into student values Johnathan, Salinas, Biology, 18";
-    string s10 = "insert into student values Justin, Wang, 19"; 
+    string s10 = "insert into student values Justin, Wang, History, 19"; 
 
     vector<string> commands; 
     commands.push_back(s1);  
@@ -334,8 +334,9 @@ bool test_parentheses(bool debug){
     cout<<"full table\n"; 
     cout<<sql.command("select * from student")<<endl; 
 
+    
     string command; 
-    command = "select * from student where age <30 and ((major = CS or major = Physics) and (lname < Y))";
+    command = "select * from student where age < 30 and ((major = CS or major = Physics) and (lname < Y))";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
@@ -352,7 +353,7 @@ bool test_parentheses(bool debug){
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    command = "select * from student where ((age <30 and age > 20) and major = Communications) or ((major = CS or major = Physics))";
+    command = "select * from student where ((age < 30 and age > 20) and major = Communications) or ((major = CS or major = Physics))";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
@@ -397,47 +398,10 @@ bool test_parentheses(bool debug){
     cout<<sql.command(command)<<endl; 
     sql.select_recnos();
 
-    //((age < 20 and age > 30)) and ((major = Art) or (major = Math)) 
-    //age 30 < age 30 > and major Art = and
-    //= ( ( and
-
-
-    /*
-    command = "select * from student where ((age < 20 and age > 30) and (major = Art or major = Math))";
-    cout<<"command: "<<command<<endl; 
-    cout<<sql.command(command)<<endl; 
-    sql.select_recnos();
-    */
-
-
-    //((age < 20 and age > 30)) and ((major = Art) or (major = Math))
-    //age 20 < age 30 > and major Art = and 
-    //( or
-      //left paren prec --> 0
-      //logical prec < relational prec 
-      //pop while popped prec < top 
-
-    //((age < 20 and age > 30) and (major = Art or major = Math))
-    //age 20 < age 30 > and major Art = major Math = or and
-    //
-    
-    //select * from student where lname>J and (major=CS or major=Art)
-
-    //
-    //0 2 
-    //A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-    /*
-    0               Anna Grace                  Del Rio                       CS                       22
-    1                 Anna Kat                  The Bat                      Art                       33
-    2                   Calvin                      Woo                  Physics                       22
-    3                      Flo                      Yao                       CS                       20
-    4                      Flo                  Jackson                     Math                       21
-    5                    Lilli                   Sutton           Communications                       34
-    6                   Oliver                     Knox                     Math                       25*/
 
   }
 
-  if(false){
+  if(debug){
     string command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= N))";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
@@ -491,7 +455,7 @@ bool test_combine(bool debug){ //combination and intersection functions are prob
 
 
 TEST(TEST_RELATIONAL, testRelational){
-  EXPECT_EQ(1, test_relational(true)); 
+  EXPECT_EQ(1, test_relational(false)); 
 }
 
 TEST(TEST_LOGICAL, testLogical){
@@ -503,7 +467,7 @@ TEST(TEST_COMBINE, testCombine){
 }
 
 TEST(TEST_PARENTHESES, testParen){
-  EXPECT_EQ(1, test_parentheses(true)); 
+  EXPECT_EQ(1, test_parentheses(false)); 
 }
 
 TEST(TEST_TOKENIZE, testTokenize){

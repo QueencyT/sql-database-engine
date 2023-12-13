@@ -145,16 +145,11 @@ void STokenizer::make_table(int _table[][MAX_COLUMNS]){
     //for parentheses state
     mark_cell(0,_table,'(', 25); 
     mark_cell(0,_table,')',25); 
-    //mark_cell(25,_table,'(', 25); 
-    //mark_cell(25,_table,')',25); 
-
 
 }
 
 bool STokenizer::done(){
     return _done; 
-    //return(_buffer[_pos] == '\0');
-    //either > or >=, if having problems modify here
 }
 
 bool STokenizer::more(){
@@ -171,7 +166,6 @@ bool STokenizer::get_token(int start_state, string& token){
     while((_buffer[_pos] > 0) && state != -1){ 
         state = _table[state][_buffer[_pos]];
         process += _buffer[_pos]; 
-        //cout<<"char: "<<_buffer[_pos]<<endl; 
         if(is_success(_table, state)){  
             if(process[0] != 34) //ignoring quotation marks
                 token += process;
@@ -181,8 +175,7 @@ bool STokenizer::get_token(int start_state, string& token){
         _pos++; 
     }
     _pos = lastSuccessPos + 1; 
-    endState = _table[0][_buffer[lastSuccessPos]];
-    //cout<<"end state: "<<endState<<endl;  
+    endState = _table[0][_buffer[lastSuccessPos]];  
     return (!token.empty()); 
 } //true of false means ? successfully got a token?
 
@@ -197,7 +190,6 @@ STokenizer& operator >> (STokenizer& s, string& t){
         t = tokStr; 
     }
     else{
-        //cout<<"error\n";
         string error(1, s._buffer[s._pos - 1]); 
         t = ""; 
     }

@@ -1,6 +1,7 @@
 #ifndef RELATIONAL_H 
 #define RELATIONAL_H 
 
+#include "../../includes/token/token.h"
 #include "../../includes/tokenTypes/Operator.h"
 #include "../../includes/table/constants.h"
 
@@ -14,7 +15,7 @@ class Relational : public Operator{
 }; 
 
 Relational::Relational(string relationalOp) : Operator(RELATIONAL_TYPE, relationalOp, RELATIONAL_PRECEDENCE){
-
+    setPrecedence(RELATIONAL_PRECEDENCE); 
 }
 
 #endif 

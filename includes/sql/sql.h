@@ -51,8 +51,6 @@ Table SQL::command(string com){
         returnTable = selectCommand(tableName);  
     } 
 
-    //cout<<"table\n"; 
-    //cout<<returnTable<<endl; 
     return returnTable; 
 }
 
