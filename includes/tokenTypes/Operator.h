@@ -20,6 +20,8 @@ class Operator : public Token{ //and relational and logical will inerit from her
         int precedence; 
 }; 
 
+#include "../../includes/tokenTypes/Operator.h"
+
 Operator::Operator() : Token(OPERATOR_TYPE){
     precedence = -1; 
 }
