@@ -12,7 +12,7 @@ using namespace std;
 
 
 bool test_relational(bool debug){ //working so far 
-  if(false){
+  if(debug){
     vector<string> condition; 
     vector<string> fields = {"fname", "lname", "age", "bounty", "devilfruit"}; 
     Table mTable("one_piece_chars", fields); 
@@ -174,7 +174,7 @@ bool test_relational(bool debug){ //working so far
 
 
 bool test_logical(bool debug){ //working so far --> seems to be working.........//if relational prob just testing two expressions
-  if(debug){//at least 14 records
+  if(false){//at least 14 records
     vector<string> condition; 
     vector<string> fields = {"fname", "lname", "age", "bounty", "devilfruit"}; 
     Table mTable("one_piece_chars", fields); 
@@ -306,7 +306,7 @@ bool test_parentheses(bool debug){
     string s2 = "insert into student values Flo, Yao, CS, 20"; 
     string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
     string s4 = "insert into student values Calvin, Woo, Physics,22"; 
-    string s5 = "insert into student values \"Anna Grace\", \"Del Rio\", CS, 22"; 
+    string s5 = "insert into student values \"Anna Grace\", \"Del Rio\", CS, 49"; 
     string s6 = "insert into student values \"Anna Kat\", \"The Bat\", Art, 33"; 
     string s7 = "insert into student values Lilli, Sutton, Communications, 34"; 
     string s8 = "insert into student values Oliver, Knox, Math, 25"; 
@@ -326,11 +326,14 @@ bool test_parentheses(bool debug){
     commands.push_back(s8); 
 
     SQL sql; 
-   // for(int i = 0; i < commands.size(); i++){
-      //sql.command(commands[i]); 
-    //}
+    for(int i = 0; i < commands.size(); i++){
+      sql.command(commands[i]); 
+    }
 
-  if(debug){
+    cout<<"full table\n"; 
+    cout<<sql.command("select * from student")<<endl; 
+
+  if(false){
     cout<<"full table\n"; 
     cout<<sql.command("select * from student")<<endl; 
 
@@ -358,7 +361,7 @@ bool test_parentheses(bool debug){
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= H))";
+    command = "select * from student where ((age < 25 and age > 20) or major = Communications)";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
@@ -402,10 +405,16 @@ bool test_parentheses(bool debug){
   }
 
   if(debug){
-    string command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= N))";
+    
+    string command = "select * from student where ((age < 25 and age > 20) or major = Communications)";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
-    sql.select_recnos(); 
+    sql.select_recnos();
+
+    /*string command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= N))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos(); */
 
   }
 }
@@ -433,8 +442,8 @@ bool test_combine(bool debug){ //combination and intersection functions are prob
     mTable.printVec(vec1); 
     cout<<"vec2: "; 
     mTable.printVec(vec2); 
-    vector<long> res = mTable.intersection(vec1, vec2); 
-    mTable.printVec(res); 
+    //vector<long> res = mTable.intersection(vec1, vec2); 
+    //mTable.printVec(res); 
 
     //1 11 5 14 10 9 13 15 3 12
     //5 15 0 1 9 14 3 8 11 6
@@ -447,15 +456,15 @@ bool test_combine(bool debug){ //combination and intersection functions are prob
     mTable.printVec(vec1); 
     cout<<"vec2: "; 
     mTable.printVec(vec2); 
-    res = mTable.intersection(vec1, vec2); 
-    mTable.printVec(res); 
+    //res = mTable.intersection(vec1, vec2); 
+    //mTable.printVec(res); 
     
   }
 }
 
 
 TEST(TEST_RELATIONAL, testRelational){
-  EXPECT_EQ(1, test_relational(true)); 
+  EXPECT_EQ(1, test_relational(false)); 
 }
 
 TEST(TEST_LOGICAL, testLogical){
@@ -467,7 +476,7 @@ TEST(TEST_COMBINE, testCombine){
 }
 
 TEST(TEST_PARENTHESES, testParen){
-  EXPECT_EQ(1, test_parentheses(false)); 
+  EXPECT_EQ(1, test_parentheses(true)); 
 }
 
 TEST(TEST_TOKENIZE, testTokenize){

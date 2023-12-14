@@ -70,10 +70,7 @@ void STokenizer::setDone(bool val){
     _done = val;
 }
 
-//TABLE STUFF 
-//COLUMN 0 (first column) - is the state (row number) a sucess state or not 
 void STokenizer::make_table(int _table[][MAX_COLUMNS]){
-    //must verify if everything init to correct states - have verified
     init_table(_table); 
 
     //state 1 - alpha state 
@@ -113,7 +110,6 @@ void STokenizer::make_table(int _table[][MAX_COLUMNS]){
     mark_cells(9,_table,'A','Z', 9); 
     mark_cells(9,_table, 'a', 'z', 9); //state 9 being the "Teresa Mae" case where we want that to be one last name 
 
-
     //for Decimal Number 
     mark_cells(0, _table,'0','9', 2); 
     mark_cells(2,_table,'0', '9', 2); 
@@ -123,17 +119,16 @@ void STokenizer::make_table(int _table[][MAX_COLUMNS]){
     mark_cells(4,_table,'0','9', 4);
     
     //for spaces - only for state 9 "teresa mae" state  
-   mark_cell(9, _table, ' ', 9);
+    mark_cell(9, _table, ' ', 9);
    
     //for decimal pt 
     mark_cell(2,_table,'.',3); 
 
-    //for punctuation - commas for now here - might need to change later 
+    //for punctuation - * and ""
     mark_cell(0, _table,'*', 7); 
     mark_cell(0, _table, 34, 8); //34 being quotation marks 
     mark_cell(9, _table, 34, 8);
     
-
     //for comparison operators 
     mark_cell(0,_table, '<', 15); 
     mark_cell(0,_table, '>', 15); 
@@ -145,10 +140,6 @@ void STokenizer::make_table(int _table[][MAX_COLUMNS]){
     //for parentheses state
     mark_cell(0,_table,'(', 25); 
     mark_cell(0,_table,')',25); 
-    //mark_cell(25,_table,'(', 25); 
-    //mark_cell(25,_table,')',25); 
-
-
 }
 
 bool STokenizer::done(){

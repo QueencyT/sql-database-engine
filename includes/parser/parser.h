@@ -20,43 +20,20 @@ class Parser{
         int stateMachine[MAX_ROWS][MAX_COLUMNS]; //for now 
         MMap<string,string> ptree; //building the ptree
 
-        
         void printTokens(vector<string> toks); 
         void makeTable();
         void buildTree(); 
         void initKeywords(); 
 
-        bool isCommandState(int state){
-            return COMMAND_STATES[state]; 
-        }
-
-        bool isTableNameState(int state){
-            return TABLE_NAME_STATES[state]; 
-        }
-
-        bool isWhereState(int state){
-            return WHERE_STATE[state]; 
-        }
-
-        bool isValueState(int state){
-            return VALUES_STATE[state]; 
-        }
-
-        bool isConditionState(int state){
-            return CONDITION_STATE[state]; 
-        }
-
-        bool isFieldNameState(int state){
-            return FIELD_NAME_STATE[state]; 
-        }
-
-        bool isKeyword(string token){
-            return keywordMap.contains(token); 
-        }
-
-        bool isColState(int state){
-            return COL_STATE[state]; 
-        }
+        //helper functions to give info on what state we are in in statemachine
+        bool isCommandState(int state){return COMMAND_STATES[state];}
+        bool isTableNameState(int state){return TABLE_NAME_STATES[state];}
+        bool isWhereState(int state){return WHERE_STATE[state];}
+        bool isValueState(int state){return VALUES_STATE[state];}
+        bool isConditionState(int state){return CONDITION_STATE[state];}
+        bool isFieldNameState(int state){return FIELD_NAME_STATE[state];}
+        bool isKeyword(string token){return keywordMap.contains(token);}
+        bool isColState(int state){return COL_STATE[state];}
 
         int getNextState(string token){
             if(isKeyword(token)){
@@ -106,8 +83,6 @@ void Parser::makeTable(){
     //state 2 - TABLE state - command state 
     //state 3 - 
 
-    //......... 
-
     //select stateMachine path 
     mark_cell(0,stateMachine,SELECT, 11);  
     mark_cell(11,stateMachine,ALL, 12); 
@@ -125,7 +100,6 @@ void Parser::makeTable(){
     mark_cell(0,stateMachine,MAKE,1); 
     mark_cell(1,stateMachine,TABLE,2); 
     mark_cell(2,stateMachine,SYMBOL,3); 
-    //mark_cell(3,stateMachine,SYMBOL,3);
     mark_cell(3,stateMachine,FIELDS, 4);
     mark_cell(4,stateMachine,SYMBOL,5); 
     mark_cell(5,stateMachine,SYMBOL,5);  
@@ -146,41 +120,30 @@ void Parser::set_string(string s){
 }
 
 void Parser::getTokens(){//gets the tokens without punc, and pushes it into tokens
-    //cout<<"exp: "<<expression<<endl; 
     char exp[expression.length() + 1]; 
     strcpy(exp, expression.c_str()); 
     STokenizer tokenizer(exp); 
-    //const string newExp = expression; 
-    //tokenizer.set_string(newExp.c_str()); 
     string tokVal; 
     tokenizer >> tokVal;
     while(tokenizer.more()){  
         if(!tokVal.empty()){
             tokens.push_back(tokVal); 
-            //cout<<"pushing back: |"<<tokVal<<"|"<<endl; 
-        }
-          
+        } 
         tokenizer >> tokVal; //has the period 
     }
-   //printTokens(tokens); 
 }
 
 
-
 MMap<string,string> Parser::parse_tree(){
-    int currState = 0, nextState = 0; 
+    int currState = 0, nextState = 0, i = 0; 
     string val;
     MMap<string,string> returnThis; 
-
-    //select * from student where lname = Yang or major = CS and age < 23 or lname = Jackson
-
-    //printTokens(tokens); //when I do print it, suddenly there is space 
 
     if(isKeyword(tokens[0]))
         currState = keywordMap.get(tokens[0]);
 
-    for(int i = 0; i < tokens.size() && currState != -1; i++){
-        //cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
+    for(i = 0; i < tokens.size() && currState != -1; i++){
+        cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
         if(i < tokens.size() - 1)
               nextState = getNextState(tokens[i+1]);  
 
@@ -207,12 +170,28 @@ MMap<string,string> Parser::parse_tree(){
         }
         currState = stateMachine[currState][nextState]; //from currState we got this newState where will we go
     }
+
+    //if(i < tokens.size()){
+        //cout<<"tokens[i]: "<<tokens[i]<<endl; 
+    //}
+    if(currState == -1 && i < tokens.size()){
+        cout<<"CURR STATE: "<<currState<<endl;
+        ptree.clear(); 
+        tokens.clear();
+        return ptree; 
+    }
+         
+    /*if(currState == -1 && i < tokens.size()){
+        cout<<"failed\n"; 
+        cout<<"tokens: "<<tokens[i]<<endl; 
+        ptree.clear(); 
+        tokens.clear();
+        //currState = 0; 
+        return ptree; 
+    }*/
     returnThis = ptree;
     ptree.clear();
     tokens.clear();
-    //cout<<"return this\n"; 
-   // cout<<returnThis<<endl; 
-
     return returnThis; 
 }//if we fail, reset ptree, reset everything, 
 

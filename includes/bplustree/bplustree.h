@@ -200,8 +200,6 @@ typename BPlusTree<T>::Iterator BPlusTree<T>::end(){
 template <typename T>
 typename BPlusTree<T>::Iterator BPlusTree<T>::find(const T& key){
 BPlusTree<T>::Iterator nullIter; 
-//cout<<"begin: "<<*begin()<<endl; 
-//cout<<"here\n";
    for(BPlusTree<T>::Iterator beg = begin(); beg != end(); beg++){
     if(*beg == key){
         BPlusTree<T>::Iterator foundIter (beg.it, beg.key_ptr); 
@@ -232,18 +230,14 @@ typename BPlusTree<T>::Iterator BPlusTree<T>::lower_bound(const T& key){ //assum
 
 template <typename T>
 typename BPlusTree<T>::Iterator BPlusTree<T>::upper_bound(const T& key){//assuming that this key is in there? prob not
-    //cout<<"upper bound called\n";
      BPlusTree<T>::Iterator found; 
 
     for(BPlusTree<T>::Iterator iter = begin(); iter != end(); iter++){ //what if we are the greatest?? --> end 
         if(*iter > key){//the first time we find something greater
-            //cout<<"found\n";
             found = iter; 
-            //cout<<"upper bound found: "<<*found<<endl; 
             return found; 
         }
     }
-    //cout<<"returning end as up bound:"<<endl; 
     return end(); 
 }  //return first that goes AFTER key
                                         //exist or not, the next entry  >entry
@@ -342,7 +336,6 @@ template <typename T>
 void BPlusTree<T>::loose_insert(const T& entry){
     int insertIndex = first_ge(data, data_count, entry);
     if(is_leaf()){ //if we finally reached leaf, insert //still want to insert in leaf, even in BPlusTree
-        //cout<<"inserted: "<<entry<<endl; 
         ordered_insert(data, data_count, entry); //should update next in fix_excess 
         return;  
     }
@@ -356,28 +349,24 @@ void BPlusTree<T>::loose_insert(const T& entry){
 
 template <typename T>
 void BPlusTree<T>::fix_excess(int fatIndex){
-   // cout<<"inside fix excess\n";
     BPlusTree<T>* fat = subset[fatIndex]; 
     T attach;
     BPlusTree<T>* right = new BPlusTree<T>(dups_ok); 
     //attach to parent
-    delete_item(fat->data, MAXIMUM/2, fat->data_count, attach); //deleting from fat 5  
+    delete_item(fat->data, MAXIMUM/2, fat->data_count, attach); //deleting from fat  
 
     split(fat->data, fat->data_count, right->data, right->data_count);
     split(fat->subset, fat->child_count, right->subset, right->child_count); 
 
-    ordered_insert(data, data_count, attach);  //attaching to parent 5 
+    ordered_insert(data, data_count, attach);  //attaching to parent 
 
     insert_item(subset, fatIndex + 1, child_count, right); //and then insert our new child into data
    
     if(fat->is_leaf()){
-        ordered_insert(right->data, right->data_count, attach); //it should insert in beginning of right again //reinsrting attach to right
+        ordered_insert(right->data, right->data_count, attach); 
         right->next = fat->next; 
         fat->next = right;
     }
-   // cout<<"after fix\n"; 
-    //cout<<*this<<endl; 
-    //cout<<"--------------\n";
 }             //fix excess in child i 
 
 
@@ -389,9 +378,7 @@ void BPlusTree<T>::insert(const T& entry){
         *found = *found + entry; //for multimap it should add to vec
         return; 
     }
-    //if(!dus ok){}else{data[i] = data[i] + entry}
-    
-  
+   
     loose_insert(entry);
 
     if(data_count > MAXIMUM){//if the root is in excess, //fixing root excess 
@@ -547,54 +534,25 @@ BPlusTree<T>* BPlusTree<T>::fix_shortage(int shortIndex){ //we return what we ju
     bool STEAL_RIGHT = (right && right->data_count > MINIMUM), STEAL_LEFT = left && left->data_count > MINIMUM, BEGIN_CASE = (shortIndex == 0); 
 
     if(STEAL_RIGHT){//can steal from right
-       /*cout<<"steal right\n"; 
-        cout<<"short: "<<shortChild->data[0]<<endl; 
-        cout<<"before steal from right\n";
-        cout<<*this<<endl; 
-        cout<<"--------------------\n";*/
-        
         transfer_left(shortIndex); 
-        returned = shortChild; 
-        /*cout<<"after steal right\n"; 
-        cout<<*this<<endl;
-        cout<<"--------------------\n";*/
-        
+        returned = shortChild;    
     }
     else if(STEAL_LEFT){//can steal from left
-      /*cout<<"before steal from left\n";
-       cout<<*this<<endl; 
-       cout<<"--------------------\n";*/
         transfer_right(shortIndex); 
         returned = shortChild; 
-        /*cout<<"after steal from left\n";
-        cout<<*this<<endl; 
-        cout<<"--------------------\n";*/
     }
     else if(BEGIN_CASE){//begin case
-        T small; 
-        /*cout<<"before begin\n";
-        cout<<*this<<endl; 
-        cout<<"--------------------\n";*/
-
+        T small;
         delete_item(data, shortIndex, data_count, deleted); //delete begin
         if(!shortChild->is_leaf())
             ordered_insert(shortChild->data, shortChild->data_count, deleted); 
         returned = merge_with_next_subset(shortIndex); 
-        /*cout<<"after begin\n";
-        cout<<*this<<endl; 
-        cout<<"--------------------\n";*/
     }
     else{
-       /*cout<<"before other\n";
-        cout<<*this<<endl; 
-        cout<<"--------------------\n";*/
         delete_item(data, shortIndex - 1, data_count, deleted); //delete last //first less than equal
        if(!shortChild->is_leaf()) //if we are not leaf, then isnert to short child, else don't 
             ordered_insert(shortChild->data, shortChild->data_count, deleted);
         returned = merge_with_next_subset(shortIndex - 1);
-        /*cout<<"after other\n";
-        cout<<*this<<endl; 
-        cout<<"--------------------\n";*/
     }
    return returned; 
 }  //fix shortage in child i
@@ -801,7 +759,7 @@ void BPlusTree<T>::print_tree(int level, ostream &outs) const{
             subset[i]->print_tree(level + 1, outs); //child will always be one more than data count  
         if(i!= 0){
             outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"dc: "<<data_count<<"cc: "<<child_count; //<<" a: "<<this; 
-            outs<<"next?: "<<boolalpha<<(next == nullptr);
+            //outs<<"next?: "<<boolalpha<<(next == nullptr);
             //if(next)
                 //outs<<"next: "<<next->data[0];  
             outs<<endl; 
@@ -869,6 +827,7 @@ template <typename T>
 T* BPlusTree<T>::find_ptr(const T& entry){ //find should be fin
     int index = first_ge(data, data_count, entry);
     T* foundPtr = nullptr; 
+
          
     if(index < data_count && data[index] == entry && is_leaf()){ //go right --> else entry must be kess so we go left =
         foundPtr = (data + index); //no we don't want this 

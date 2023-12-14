@@ -23,15 +23,15 @@ int main(int argv, char** argc) {
 /*15*/     "select * from employee where last=Blow and major=\"JoAnn\""
 }; 
 
-SQL sql1; 
+//SQL sql1; 
 
-for(int i = 0; i < command_list.size(); i++){
+/*for(int i = 0; i < command_list.size(); i++){
     cout<<"com: "<<command_list[i]<<endl;
     cout<<sql1.command(command_list[i])<<endl;  
-}
+}*/
 
 
-    /*string command;
+    string command;
     SQL sql1; 
 
     while(true){
@@ -42,7 +42,7 @@ for(int i = 0; i < command_list.size(); i++){
         if(command == "exit")
             break;   
         cout<<sql1.command(command)<<endl; 
-    }*/
+    }
     
     cout << "\n\n\n=====================" << endl;
     return 0;

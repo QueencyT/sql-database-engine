@@ -12,19 +12,16 @@ using namespace std;
 class FileRecord
 {
 public:
+    //constructors
     FileRecord(); 
     FileRecord(vector<string> data); 
 
-    //when you construct a FileRecord, it's either empty or it
-    //  contains a word
 
     long write(fstream& outs);              //returns the record number
     long read(fstream& ins, long recno);    //returns the number of bytes
                                             //      read = MAX, or zero if
                                             //      read passed the end of file
-    vector<string> get_record(); 
-
-
+    vector<string> get_record(); //gets the record information and puts it into a vector of strings
     friend ostream& operator<<(ostream& outs, const FileRecord& r){
         for(int row = 0; row < r.MAX_ROWS && r._record[row][0] != '\0'; row++){
             for(int col = 0; r._record[row][col] != '\0'; col++){
@@ -54,7 +51,6 @@ void FileRecord::init_array(){
     }
 }
 
-
 FileRecord::FileRecord(){
     recNum = 0;
     init_array(); 
@@ -68,7 +64,6 @@ FileRecord::FileRecord(vector<string> data){ //vector of all the fields to write
         for(int i = 0; i < data[n].length(); i++){
             _record[n][i] = data[n][i]; 
         }
-       //_record[n][i] = '\0'; //making sure the arrays are null terminated
     }
 } 
 
@@ -87,27 +82,25 @@ vector<string> FileRecord::get_record(){
 
 long FileRecord::write(fstream& mFile){
     std::streampos gCount = mFile.tellg(); 
-    mFile.seekg(gCount); //for now, just writing in beginning //
+    mFile.seekg(gCount); //for now, just writing in beginning 
     for(int i = 0; i < MAX_ROWS; i++){
         mFile.write(*(_record + i), MAX_COLS + 1); 
     }
 
     std::streampos byteSize = mFile.tellg(); 
-    recNum = byteSize / (MAX_ROWS * (MAX_COLS + 1)); //recNum--; //at its very least it will be one skewing evrything
-    recNum--; //decrement so recs start from 0 
+    recNum = byteSize / (MAX_ROWS * (MAX_COLS + 1));
+    recNum--;
     return recNum; 
     //writes the record into file and increment record num 
 } //returns the record number
 
 long FileRecord::read(fstream& mFile, long recno){ //constraint assumption --> recno starts from 0 
-    //mFile.seekg((recno - 1) * (MAX_ROWS * (MAX_COLS + 1))); 
     mFile.seekg((recno) * (MAX_ROWS * (MAX_COLS + 1))); 
     int pos = mFile.tellg(); 
 
     for(int row = 0; row < MAX_ROWS; row++){ 
         mFile.read(*(_record + row), MAX_COLS + 1);
     } 
-    //cout<<"bytesRead: "<<mFile.tellg()<<endl; 
     return mFile.tellg(); //for now ??
 }//returns the number of bytes
 

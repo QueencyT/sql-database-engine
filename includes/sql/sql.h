@@ -38,6 +38,12 @@ vector<long> SQL::select_recnos(){
 Table SQL::command(string com){
     parser.set_string(com); 
     statementTree = parser.parse_tree(); 
+    if(statementTree.empty()){
+        string mt = "empty table.txt"; 
+        vector<string> emptyF = {"empty"};
+        Table empty(mt.c_str(), emptyF); 
+        return empty;
+    }
     string command = statementTree.get("command")[0]; //will always have a t
     string tableName = statementTree.get("table_name")[0];
     Table returnTable; 
@@ -51,9 +57,6 @@ Table SQL::command(string com){
     }else if(command == "select"){ //if * or age,lname, 
         returnTable = selectCommand(tableName);  
     } 
-
-    //cout<<"table\n"; 
-    //cout<<returnTable<<endl; 
     return returnTable; 
 }
 
@@ -66,13 +69,8 @@ Table SQL::makeCommand(string tableName){
 
 Table SQL::insertCommand(string tableName){
     mTable = Table(tableName.c_str()); 
-   // cout<<"map: 0: "<<endl; 
-   // cout<<mTable.mTable[1]<<endl; 
-
     vector<string> vals = statementTree.get("values");
     mTable.insert_into(vals);
-    //cout<<"after map: "<<endl;  
-   // cout<<mTable.mTable[1]<<endl; 
     return mTable; 
 }
 
@@ -81,20 +79,7 @@ Table SQL::selectCommand(string tableName){
     mTable = Table(tableName.c_str());
     allFields = mTable.getFields(); 
 
-    cout<<"statement tree: \n"; 
-    cout<<statementTree<<endl; 
-
-    cout<<"received table\n"; 
-    cout<<mTable<<endl; 
-    cout<<"mTable map[0]: "<<endl; 
-    cout<<mTable.mTable[0]<<endl; 
-
-    cout<<"fields: "<<allFields.size()<<endl; 
-
-    if(selectAll() && !hasCondition()){
-        cout<<"select all with no condition\n"; 
-        cout<<"allFields: "<<allFields[0]<<endl; 
-        cout<<"size fields: "<<allFields.size()<<endl;  
+    if(selectAll() && !hasCondition()){ 
         return mTable.select_all(allFields); 
     }
     else if(selectAll() && hasCondition()){
