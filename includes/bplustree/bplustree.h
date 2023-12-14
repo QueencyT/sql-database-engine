@@ -12,7 +12,7 @@ public:
     class Iterator{
     public:
         friend class BPlusTree;
-        Iterator(BPlusTree<T>* _it=nullptr, int _key_ptr = 0): it(_it), key_ptr(_key_ptr){}
+        Iterator(BPlusTree<T>* _it=NULL, int _key_ptr = 0): it(_it), key_ptr(_key_ptr){}
 
 
         //return first data item in b plus tree
@@ -23,10 +23,10 @@ public:
         Iterator operator++(int un_used){//hmm?
             key_ptr++; 
             Iterator returnIter(it, key_ptr); 
-            if(it && key_ptr >= it->data_count){ //next bPlusTree 
+            if(key_ptr == it->data_count){ //next bPlusTree 
                 key_ptr = 0;
-                it = it->next;
-                returnIter = Iterator(it, key_ptr);
+                it = it->next; 
+                Iterator returnIter(it, key_ptr);
             }
             return returnIter; 
         }
@@ -35,11 +35,10 @@ public:
             key_ptr++; 
             Iterator returnIter(it, key_ptr); 
 
-            if(it && key_ptr == it->data_count){ //next bPlusTree 
+            if(key_ptr == it->data_count){ //next bPlusTree 
                 key_ptr = 0;
-                //cout<<"it: "<<*it<<endl; 
                 it = it->next; 
-                returnIter = Iterator(it, key_ptr); 
+                Iterator returnIter(it->next, key_ptr); 
             }
             return returnIter; 
         }
@@ -134,6 +133,9 @@ public:
     }
 
     
+
+    
+
 private:
     static const int MINIMUM = 1;
     static const int MAXIMUM = 2 * MINIMUM;
@@ -144,7 +146,6 @@ private:
     int child_count;                     //number of children
     BPlusTree* subset[MAXIMUM + 2];      //subtrees
     BPlusTree* next;
-    
 
 
     bool is_leaf() const{
@@ -254,7 +255,6 @@ BPlusTree<T>::BPlusTree(bool dups){
     data_count = 0; 
     child_count = 0; 
     dups_ok = dups; 
-    //cout<<"DUPS ALLOWED:?"<<boolalpha<<dups_ok<<endl; 
     //cout<<"dups allowed?: "<<boolalpha<<dups<<endl; 
 }
 
@@ -262,7 +262,6 @@ template <typename T>
 BPlusTree<T>::BPlusTree(T *a, int size, bool dups){ //making a btree
     next = nullptr; 
     dups_ok = dups; 
-    //cout<<"DUPS ALLOWED:?"<<boolalpha<<dups_ok<<endl; 
     data_count = 0; 
     child_count = 0; 
     for(int i = 0; i < size; i++){
@@ -277,7 +276,6 @@ BPlusTree<T>::BPlusTree(const BPlusTree<T>& other){//copy ctor
     child_count = 0; 
     data_count = 0; 
     copy_tree(other); 
-    dups_ok = other.dups_ok; 
 }
 
 template <typename T>
@@ -294,7 +292,6 @@ BPlusTree<T>& BPlusTree<T>::operator =(const BPlusTree<T>& RHS){
 
     clear_tree(); 
     copy_tree(RHS); 
-    dups_ok = RHS.dups_ok; 
     return *this; 
 }
 
@@ -311,29 +308,13 @@ void BPlusTree<T>::copy_tree(const BPlusTree<T>& other, BPlusTree<T>*& last_node
     for(int i = 0; i < other.child_count; i++){//if other is a leaf then there is nothing else to copy
         BPlusTree<T>* copyChild = new BPlusTree<T>; 
         subset[i] = copyChild;
-        subset[i]->copy_tree(*other.subset[i], last_node); 
-    }
-   
-   if(other.is_leaf()){
-    if(last_node){
-         last_node->next = this; 
-    }
-       
-    last_node = this; 
-   }
-   /*
-    copy_array(data, other.data, data_count, other.data_count); //copying other data 
-    child_count = other.child_count;
-    for(int i = 0; i < other.child_count; i++){//if other is a leaf then there is nothing else to copy
-        BPlusTree<T>* copyChild = new BPlusTree<T>(dups_ok); 
-        subset[i] = copyChild;
         if(last_node && last_node->is_leaf()){
             last_node->next = subset[i]; 
         } 
         if(other.subset[i]->is_leaf())
             last_node = subset[i]; 
         subset[i]->copy_tree(*other.subset[i], last_node); 
-    }*/
+    }
 }
 
 
@@ -341,14 +322,14 @@ void BPlusTree<T>::copy_tree(const BPlusTree<T>& other, BPlusTree<T>*& last_node
 template <typename T>
 void BPlusTree<T>::loose_insert(const T& entry){
     int insertIndex = first_ge(data, data_count, entry);
-    if(is_leaf()){ //if we finally reached leaf, insert //still want to insert in leaf, even in BPlusTree
-        //cout<<"inserted: "<<entry<<endl; 
+    if(is_leaf()){ //if we finally reached leaf, insert //still want to insert in leaf, even in BPlusTree 
         ordered_insert(data, data_count, entry); //should update next in fix_excess 
         return;  
     }
 
     subset[insertIndex]->loose_insert(entry);
     BPlusTree<T>* fatChild = subset[insertIndex]; //possibly fat child //it has to be the subset at the insertedIndex whos fat 
+
     if(fatChild->data_count > MAXIMUM){//we are in excess 
         fix_excess(insertIndex); 
     }
@@ -356,10 +337,9 @@ void BPlusTree<T>::loose_insert(const T& entry){
 
 template <typename T>
 void BPlusTree<T>::fix_excess(int fatIndex){
-   // cout<<"inside fix excess\n";
     BPlusTree<T>* fat = subset[fatIndex]; 
     T attach;
-    BPlusTree<T>* right = new BPlusTree<T>(dups_ok); 
+    BPlusTree<T>* right = new BPlusTree<T>; 
     //attach to parent
     delete_item(fat->data, MAXIMUM/2, fat->data_count, attach); //deleting from fat 5  
 
@@ -375,17 +355,14 @@ void BPlusTree<T>::fix_excess(int fatIndex){
         right->next = fat->next; 
         fat->next = right;
     }
-   // cout<<"after fix\n"; 
-    //cout<<*this<<endl; 
-    //cout<<"--------------\n";
 }             //fix excess in child i 
 
 
 template <typename T>
 void BPlusTree<T>::insert(const T& entry){ 
-    T* found = find_ptr(entry);  
-    //cout<<"duops?: "<<boolalpha<<dups_ok<<endl;
-    if(found && dups_ok){//update 
+    T* found = find_ptr(entry); 
+
+    if(found){//update 
         *found = *found + entry; //for multimap it should add to vec
         return; 
     }
@@ -396,7 +373,7 @@ void BPlusTree<T>::insert(const T& entry){
 
     if(data_count > MAXIMUM){//if the root is in excess, //fixing root excess 
         T attach; 
-        BPlusTree<T>* copy = new BPlusTree<T>(dups_ok); 
+        BPlusTree<T>* copy = new BPlusTree<T>; 
 
         copy_array(copy->data, data, copy->data_count, data_count); //copying data into copy 
         copy_array(copy->subset, subset, copy->child_count, child_count); //copying children into copy 
@@ -413,7 +390,7 @@ void BPlusTree<T>::insert(const T& entry){
 
 template <typename T>
 BPlusTree<T>* BPlusTree<T>::get_smallest_node(){
-    BPlusTree<T>* returnThis(dups_ok); 
+    BPlusTree<T>* returnThis; 
      if(is_leaf()){
         return this; 
     }
@@ -460,7 +437,7 @@ template <typename T>
 void BPlusTree<T>::transfer_left(int index){ //assuming this is rotate left //stealing from right 
     //assuming for the rotates nothing changes about the next ptr 
     T deleted;
-    BPlusTree<T>* deletedChild(dups_ok); 
+    BPlusTree<T>* deletedChild; 
     BPlusTree<T>* shortChild = subset[index];  //rotate to 
     BPlusTree<T>* right = subset[index + 1]; //borrowing from right
 
@@ -486,7 +463,7 @@ template <typename T>
 void BPlusTree<T>::transfer_right(int index){//assuming this is rotate right //stealing from left
     //when we are at leaves, do 
     T deleted; 
-    BPlusTree<T>* deletedChild(dups_ok); 
+    BPlusTree<T>* deletedChild; 
     BPlusTree<T>* shortChild = subset[index]; 
     BPlusTree<T>* left = subset[index - 1];
 
@@ -513,7 +490,7 @@ template <typename T>
 BPlusTree<T>* BPlusTree<T>::merge_with_next_subset(int index){
     //doesn't seem like I need to update the next ptr
 
-    BPlusTree<T>* deleted(dups_ok); 
+    BPlusTree<T>* deleted; 
     BPlusTree<T>* merging = subset[index]; 
     BPlusTree<T>* right = subset[index + 1];
 
@@ -801,9 +778,8 @@ void BPlusTree<T>::print_tree(int level, ostream &outs) const{
             subset[i]->print_tree(level + 1, outs); //child will always be one more than data count  
         if(i!= 0){
             outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"dc: "<<data_count<<"cc: "<<child_count; //<<" a: "<<this; 
-            outs<<"next?: "<<boolalpha<<(next == nullptr);
-            //if(next)
-                //outs<<"next: "<<next->data[0];  
+            if(next)
+                outs<<"next: "<<next->data[0];  
             outs<<endl; 
         }
     }
@@ -869,7 +845,6 @@ template <typename T>
 T* BPlusTree<T>::find_ptr(const T& entry){ //find should be fin
     int index = first_ge(data, data_count, entry);
     T* foundPtr = nullptr; 
-         
     if(index < data_count && data[index] == entry && is_leaf()){ //go right --> else entry must be kess so we go left =
         foundPtr = (data + index); //no we don't want this 
         return foundPtr; 

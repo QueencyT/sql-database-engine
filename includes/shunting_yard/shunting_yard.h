@@ -173,4 +173,4 @@ void ShuntingYard::operatorDecider(Token* popped, Queue<Token*>& symbols, Stack<
 
 //if new opeator is higher precedence then pop the stack 
 
-#endif 
+#endif
