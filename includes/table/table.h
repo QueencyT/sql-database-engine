@@ -64,15 +64,15 @@ class Table{
         //logical eval functions  //public for now
         vector<long> combine(vector<long> left, vector<long> right);
         vector<long> intersection(vector<long> left, vector<long> right);
+        vector<MMap<string,long>> mTable; //each index represents a 
        
     private: 
-        vector<MMap<string,long>> mTable; //each index represents a 
+       
         Map<string, long> ourFields; 
         vector<long> selectedVec; //for select recnos (all the vecs in a table)
         vector<string> fields; 
         static int serial;
         string filName, saveName; 
-        int totalRecords; 
     
         //private helper funcs 
         //construction functions 
@@ -85,7 +85,7 @@ class Table{
 
         vector<long> iterate(MMap<string, long>::Iterator start, MMap<string, long>::Iterator end);
 
-        
+        int totalRecords; 
 
         vector<string> printFields(vector<string> f){
         for(int i = 0; i < f.size(); i++){
@@ -117,12 +117,13 @@ void Table::initTable(fstream& readThis){//init table from fiel
         bytes = recordReader.read(readThis, ++i);
         totalRecords++; 
     }
+    
 }
 
 void Table::buildIndexes(vector<string> fields){
      for(int i = 0; i < fields.size();i++){
         MMap<string, long> aMap; 
-        mTable.push_back(aMap); 
+        mTable.push_back(aMap);
         ourFields.insert(fields.at(i), i);
     }
 }
@@ -130,8 +131,8 @@ void Table::buildIndexes(vector<string> fields){
 Table::Table(){
     fstream aFile; 
     open_fileW(aFile, "temp.bin"); //opening file //still havent done anything with field names
-    serial++; 
     totalRecords = 0; 
+    serial++; 
 }
 
 Table::Table(const char fileName[]){ 
@@ -139,8 +140,7 @@ Table::Table(const char fileName[]){
     FileRecord recordReader; 
     filName = fileName; 
     saveName = filName + "info.txt"; 
-    totalRecords = 0;
-
+    totalRecords = 0; 
 
     open_fileRW(aFile, fileName); //opening file 
     open_fileRW(savedInfo, saveName.c_str()); 
@@ -149,8 +149,10 @@ Table::Table(const char fileName[]){
     buildIndexes(savedFields);
    // cout<<"ctor fired\n"; 
     fields = savedFields; 
+    //cout<<"savedFields size: "<<savedFields.size()<<endl; 
     initTable(aFile); 
-
+    //cout<<"after init table\n"; 
+    //cout<<mTable[0]<<endl; 
     serial++;  
     aFile.close();
 }
@@ -159,12 +161,12 @@ Table::Table(const char fileName[], vector<string> fieldNames){
     FileRecord saveInfo = FileRecord(fieldNames); 
     fstream aFile, info;  
     filName = fileName;
-    saveName = filName + "info.txt"; 
+    saveName = filName + "info.txt";
+    totalRecords = 0;  
 
     open_fileW(aFile, filName.c_str()); 
     open_fileW(info, saveName.c_str()); 
     saveInfo.write(info);
-    totalRecords = 0; 
 
     buildIndexes(fieldNames); 
     fields = fieldNames; 
@@ -174,16 +176,23 @@ Table::Table(const char fileName[], vector<string> fieldNames){
 }
 
 void Table::insert_into(vector<string> data){//insert the rparts of the record into the correct multimaps
+   // cout<<"before insertion: "<<endl; 
+   // cout<<mTable[0]<<endl; 
+   // cout<<"----------------------------\n"; 
+
     FileRecord recordedFiles = FileRecord(data); //write fiiles 
     fstream aFile; 
     open_fileRW(aFile, filName.c_str()); 
     aFile.seekg(0,aFile.end); 
     int recordNum = recordedFiles.write(aFile);
-
+    //cout<<"recordNUm: "<<recordNum<<endl; 
     for(int i = 0; i < data.size(); i++){
+       // cout<<"inserting: "<<data[i]<<endl; 
         mTable[i].insert(data[i], recordNum); 
     }
-    totalRecords++; 
+    //cout<<"after insertion: "<<endl; 
+    //cout<<mTable[0]<<endl; 
+    //cout<<"----------------------------\n"; 
     aFile.close();
 }
 
@@ -209,6 +218,9 @@ vector<long> Table::iterate(MMap<string, long>::Iterator start, MMap<string, lon
 
 vector<long> Table::eval(string field, string op, string key){
     int index = ourFields.get(field);
+    cout<<"table: "<<endl; 
+    cout<<mTable[index]<<endl; 
+
     vector<long> recnos; 
     MMap<string, long>::Iterator beg = mTable[index].begin(), end = mTable[index].end(), upBound = mTable[index].upper_bound(key),
     lowBound = mTable[index].lower_bound(key);
@@ -222,12 +234,9 @@ vector<long> Table::eval(string field, string op, string key){
     }else if(op == ">="){
         recnos = iterate(lowBound, end); 
     }else if(op == "<="){
-       // cout<<"op: "<<op<<endl; 
         MPair<string, long> low; 
         if(lowBound != mTable[index].end())
             low = *lowBound; 
-       //cout<<"key: "<<key<<endl; 
-      // cout<<"low key: "<<low.key<<endl; 
        if(lowBound != mTable[index].end() && low.key == key){
         MMap<string,long>::Iterator next = lowBound++;
         recnos = iterate(beg, next); 
@@ -322,33 +331,21 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
     Stack<string> toBeEvaluated; 
     Stack<vector<long>> recNums; 
     vector<long> mVec; 
-
-    //cout<<"TABLE\n"; 
-    //cout<<*this<<endl; 
     
     //result vec
     //when evaluated, a vector of recnos will be returned.... 
     while(!postFix.empty()){
         Token* popped = postFix.pop(); 
         int type = popped->getType(); 
-        string tokVal = popped->getToken(); 
-        //cout<<"popped: "<<tokVal<<endl; 
-        //cout<<"post fix stack: "; 
-       // printQueue(postFix); 
+        string tokVal = popped->getToken();
 
         if(type == RELATIONAL_TYPE){//relational, logical
             if(!toBeEvaluated.empty()){ //prob won't be empty 
-                //cout<<"inside relational\n"; 
                 string key = toBeEvaluated.pop(); //first pop key, second pop field name
-                //cout<<"key: "<<key<<endl; 
                 string field = toBeEvaluated.pop(); 
-                //cout<<"field: "<<field<<endl; 
                 vector<long> receivedNums = eval(field, tokVal, key); //popped at this point should be the operator
-                //cout<<"recs: "; 
-                //printVec(receivedNums); 
+                printVec(receivedNums); 
                 recNums.push(receivedNums); 
-                
-                //then send it into evaluate
             }
         }
         else if(type == LOGICAL_TYPE){
@@ -372,13 +369,6 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
     selectedVec = res; 
     Table returnTable = vector_to_table(fields, res);
     return returnTable; 
-
-    //2 0
-
-    //2 and 0
-
-
-    
 }
 
 

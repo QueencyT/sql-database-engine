@@ -46,6 +46,7 @@ Table SQL::command(string com){
         returnTable = makeCommand(tableName); 
     }
     else if(command == "insert"){
+        cout<<"SQL - inserting\n";
        returnTable =  insertCommand(tableName); 
     }else if(command == "select"){ //if * or age,lname, 
         returnTable = selectCommand(tableName);  
@@ -65,8 +66,13 @@ Table SQL::makeCommand(string tableName){
 
 Table SQL::insertCommand(string tableName){
     mTable = Table(tableName.c_str()); 
+   // cout<<"map: 0: "<<endl; 
+   // cout<<mTable.mTable[1]<<endl; 
+
     vector<string> vals = statementTree.get("values");
-    mTable.insert_into(vals); 
+    mTable.insert_into(vals);
+    //cout<<"after map: "<<endl;  
+   // cout<<mTable.mTable[1]<<endl; 
     return mTable; 
 }
 
@@ -75,9 +81,21 @@ Table SQL::selectCommand(string tableName){
     mTable = Table(tableName.c_str());
     allFields = mTable.getFields(); 
 
+    cout<<"statement tree: \n"; 
+    cout<<statementTree<<endl; 
+
+    cout<<"received table\n"; 
+    cout<<mTable<<endl; 
+    cout<<"mTable map[0]: "<<endl; 
+    cout<<mTable.mTable[0]<<endl; 
+
+    cout<<"fields: "<<allFields.size()<<endl; 
+
     if(selectAll() && !hasCondition()){
         cout<<"select all with no condition\n"; 
-        return mTable.select_all(allFields);  
+        cout<<"allFields: "<<allFields[0]<<endl; 
+        cout<<"size fields: "<<allFields.size()<<endl;  
+        return mTable.select_all(allFields); 
     }
     else if(selectAll() && hasCondition()){
         cout<<"select all with condition\n"; 
