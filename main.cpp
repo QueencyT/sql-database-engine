@@ -34,7 +34,7 @@ int main(int argv, char** argc) {
     string command;
     SQL sql1; 
 
-    while(true){
+    /*while(true){
         cout<<"Please enter a command: \n";
         cout<<"or if you'd like to quit: please type exit\n"; 
         getline(cin, command); 
@@ -42,7 +42,7 @@ int main(int argv, char** argc) {
         if(command == "exit")
             break;   
         cout<<sql1.command(command)<<endl; 
-    }
+    }*/
     
     cout << "\n\n\n=====================" << endl;
     return 0;
