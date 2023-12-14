@@ -69,7 +69,7 @@ FileRecord::FileRecord(vector<string> data){ //vector of all the fields to write
             _record[n][i] = data[n][i]; 
         }
        //_record[n][i] = '\0'; //making sure the arrays are null terminated
-    }
+    }//
 } 
 
 vector<string> FileRecord::get_record(){
