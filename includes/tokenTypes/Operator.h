@@ -77,4 +77,4 @@ void Operator::setPrecedence(int prec){
     precedence = prec; 
 }
 
-#endif  
+#endif
