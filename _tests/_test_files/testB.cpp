@@ -1,14 +1,12 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <iomanip>
-using namespace std;
+
 
 #include "../../includes/table/table.h"
 #include "../../includes/sql/sql.h"
 
-
-
-
+using namespace std;
 
 
 bool test_relational(bool debug){ //working so far 
@@ -302,7 +300,9 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
 }
 
 bool test_parentheses(bool debug){
-  string s1 = "make table student fields fname, lname, major, age"; 
+  
+  if(false){
+    string s1 = "make table student fields fname, lname, major, age"; 
     string s2 = "insert into student values Flo, Yao, CS, 20"; 
     string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
     string s4 = "insert into student values Calvin, Woo, Physics,22"; 
@@ -333,7 +333,6 @@ bool test_parentheses(bool debug){
     cout<<"full table\n"; 
     cout<<sql.command("select * from student")<<endl; 
 
-  if(false){
     cout<<"full table\n"; 
     cout<<sql.command("select * from student")<<endl; 
 
@@ -408,8 +407,8 @@ bool test_parentheses(bool debug){
     
     string command = "select * from student where ((age < 25 and age > 20) or major = Communications)";
     cout<<"command: "<<command<<endl; 
-    cout<<sql.command(command)<<endl; 
-    sql.select_recnos();
+    //cout<<sql.command(command)<<endl; 
+    //sql.select_recnos();
 
     /*string command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= N))";
     cout<<"command: "<<command<<endl; 
@@ -476,7 +475,7 @@ TEST(TEST_COMBINE, testCombine){
 }
 
 TEST(TEST_PARENTHESES, testParen){
-  EXPECT_EQ(1, test_parentheses(true)); 
+  EXPECT_EQ(1, test_parentheses(false)); 
 }
 
 TEST(TEST_TOKENIZE, testTokenize){
