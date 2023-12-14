@@ -31,8 +31,8 @@ int main(int argv, char** argc) {
 }*/
 
 
-    string command;
-    SQL sql1; 
+   // string command;
+    //SQL sql1; 
 
     /*while(true){
         cout<<"Please enter a command: \n";
