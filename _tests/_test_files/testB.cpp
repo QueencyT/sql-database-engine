@@ -1,16 +1,18 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <iomanip>
-
+using namespace std;
 
 #include "../../includes/table/table.h"
 #include "../../includes/sql/sql.h"
 
-using namespace std;
+
+
+
 
 
 bool test_relational(bool debug){ //working so far 
-  if(debug){
+  if(false){
     vector<string> condition; 
     vector<string> fields = {"fname", "lname", "age", "bounty", "devilfruit"}; 
     Table mTable("one_piece_chars", fields); 
@@ -65,9 +67,8 @@ bool test_relational(bool debug){ //working so far
 
     condition = {"age", ">=", "33"}; //less than NOT working
     cout<<"select: "<<condition<<endl; 
-    //vector<string> last = {"lname"}; 
     cout<<mTable.select(fields, condition)<<endl; 
-    //cout<<"recnos: "<<endl; 
+    cout<<"recnos: "<<endl; 
     mTable.select_recnos(); 
   }
 
@@ -165,14 +166,15 @@ bool test_relational(bool debug){ //working so far
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos();
+
+
   }
-  return true; 
 }
 
 
 
 bool test_logical(bool debug){ //working so far --> seems to be working.........//if relational prob just testing two expressions
-  if(false){//at least 14 records
+  if(debug){//at least 14 records
     vector<string> condition; 
     vector<string> fields = {"fname", "lname", "age", "bounty", "devilfruit"}; 
     Table mTable("one_piece_chars", fields); 
@@ -287,7 +289,7 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
     sql.select_recnos();
 
 
-    command = "select * from student where age < 30 and major = CS or major = Physics and lname = Jackson"; 
+    command = "select * from student where age <30 and major = CS or major = Physics and lname = Jackson"; 
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
@@ -300,18 +302,16 @@ bool test_logical(bool debug){ //working so far --> seems to be working.........
 }
 
 bool test_parentheses(bool debug){
-  
-  if(false){
-    string s1 = "make table student fields fname, lname, major, age"; 
+  string s1 = "make table student fields fname, lname, major, age"; 
     string s2 = "insert into student values Flo, Yao, CS, 20"; 
     string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
     string s4 = "insert into student values Calvin, Woo, Physics,22"; 
-    string s5 = "insert into student values \"Anna Grace\", \"Del Rio\", CS, 49"; 
+    string s5 = "insert into student values \"Anna Grace\", \"Del Rio\", CS, 22"; 
     string s6 = "insert into student values \"Anna Kat\", \"The Bat\", Art, 33"; 
     string s7 = "insert into student values Lilli, Sutton, Communications, 34"; 
     string s8 = "insert into student values Oliver, Knox, Math, 25"; 
     string s9 = "insert into student values Johnathan, Salinas, Biology, 18";
-    string s10 = "insert into student values Justin, Wang, History, 19"; 
+    string s10 = "insert into student values Justin, Wang, 19"; 
 
     vector<string> commands; 
     commands.push_back(s1);  
@@ -330,15 +330,12 @@ bool test_parentheses(bool debug){
       sql.command(commands[i]); 
     }
 
+  if(debug){
     cout<<"full table\n"; 
     cout<<sql.command("select * from student")<<endl; 
 
-    cout<<"full table\n"; 
-    cout<<sql.command("select * from student")<<endl; 
-
-    
     string command; 
-    command = "select * from student where age < 30 and ((major = CS or major = Physics) and (lname < Y))";
+    command = "select * from student where age <30 and ((major = CS or major = Physics) and (lname < Y))";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
@@ -355,12 +352,12 @@ bool test_parentheses(bool debug){
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    command = "select * from student where ((age < 30 and age > 20) and major = Communications) or ((major = CS or major = Physics))";
+    command = "select * from student where ((age <30 and age > 20) and major = Communications) or ((major = CS or major = Physics))";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
 
-    command = "select * from student where ((age < 25 and age > 20) or major = Communications)";
+    command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= H))";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos(); 
@@ -400,20 +397,51 @@ bool test_parentheses(bool debug){
     cout<<sql.command(command)<<endl; 
     sql.select_recnos();
 
+    //((age < 20 and age > 30)) and ((major = Art) or (major = Math)) 
+    //age 30 < age 30 > and major Art = and
+    //= ( ( and
+
+
+    /*
+    command = "select * from student where ((age < 20 and age > 30) and (major = Art or major = Math))";
+    cout<<"command: "<<command<<endl; 
+    cout<<sql.command(command)<<endl; 
+    sql.select_recnos();
+    */
+
+
+    //((age < 20 and age > 30)) and ((major = Art) or (major = Math))
+    //age 20 < age 30 > and major Art = and 
+    //( or
+      //left paren prec --> 0
+      //logical prec < relational prec 
+      //pop while popped prec < top 
+
+    //((age < 20 and age > 30) and (major = Art or major = Math))
+    //age 20 < age 30 > and major Art = major Math = or and
+    //
+    
+    //select * from student where lname>J and (major=CS or major=Art)
+
+    //
+    //0 2 
+    //A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+    /*
+    0               Anna Grace                  Del Rio                       CS                       22
+    1                 Anna Kat                  The Bat                      Art                       33
+    2                   Calvin                      Woo                  Physics                       22
+    3                      Flo                      Yao                       CS                       20
+    4                      Flo                  Jackson                     Math                       21
+    5                    Lilli                   Sutton           Communications                       34
+    6                   Oliver                     Knox                     Math                       25*/
 
   }
 
-  if(debug){
-    
-    string command = "select * from student where ((age < 25 and age > 20) or major = Communications)";
-    cout<<"command: "<<command<<endl; 
-    //cout<<sql.command(command)<<endl; 
-    //sql.select_recnos();
-
-    /*string command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= N))";
+  if(false){
+    string command = "select * from student where ((age < 25 and age > 20) or major = Communications) or ((lname > D and lname <= N))";
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
-    sql.select_recnos(); */
+    sql.select_recnos(); 
 
   }
 }
@@ -441,8 +469,8 @@ bool test_combine(bool debug){ //combination and intersection functions are prob
     mTable.printVec(vec1); 
     cout<<"vec2: "; 
     mTable.printVec(vec2); 
-    //vector<long> res = mTable.intersection(vec1, vec2); 
-    //mTable.printVec(res); 
+    vector<long> res = mTable.intersection(vec1, vec2); 
+    mTable.printVec(res); 
 
     //1 11 5 14 10 9 13 15 3 12
     //5 15 0 1 9 14 3 8 11 6
@@ -455,19 +483,19 @@ bool test_combine(bool debug){ //combination and intersection functions are prob
     mTable.printVec(vec1); 
     cout<<"vec2: "; 
     mTable.printVec(vec2); 
-    //res = mTable.intersection(vec1, vec2); 
-    //mTable.printVec(res); 
+    res = mTable.intersection(vec1, vec2); 
+    mTable.printVec(res); 
     
   }
 }
 
 
 TEST(TEST_RELATIONAL, testRelational){
-  EXPECT_EQ(1, test_relational(false)); 
+  EXPECT_EQ(1, test_relational(true)); 
 }
 
 TEST(TEST_LOGICAL, testLogical){
-  EXPECT_EQ(1, test_logical(false)); 
+  EXPECT_EQ(1, test_logical(true)); 
 }
 
 TEST(TEST_COMBINE, testCombine){
@@ -475,7 +503,7 @@ TEST(TEST_COMBINE, testCombine){
 }
 
 TEST(TEST_PARENTHESES, testParen){
-  EXPECT_EQ(1, test_parentheses(false)); 
+  EXPECT_EQ(1, test_parentheses(true)); 
 }
 
 TEST(TEST_TOKENIZE, testTokenize){
@@ -504,4 +532,3 @@ int main(int argc, char **argv) {
   std::cout<<"\n\n----------running testB.cpp---------\n\n"<<std::endl;
   return RUN_ALL_TESTS();
 }
-

@@ -17,4 +17,4 @@ Relational::Relational(string relationalOp) : Operator(RELATIONAL_TYPE, relation
 
 }
 
-#endif 
+#endif  

@@ -16,4 +16,4 @@ Logical::Logical(string logicalOp) : Operator(LOGICAL_TYPE, logicalOp){ //MODIFI
 
 }
 
-#endif  
+#endif   

@@ -107,7 +107,6 @@ public:
     }
 
     vector<V>& get(const K& key){
-        //cout<<"get\n"; 
         MPair<K,V> getThis(key);
         return mmap.get(getThis).value_list; 
     }
@@ -164,4 +163,4 @@ private:
     BPlusTree<MPair<K, V> > mmap;
 };
 
-#endif  
+#endif 
