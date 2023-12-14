@@ -6,7 +6,6 @@ const int RELATIONAL_TYPE = 2;
 const int LOGICAL_TYPE = 3; 
 const int PAREN_TYPE = 4; 
 const int TOKEN_STR_TYPE = 5; 
-const int RESULT_SET_TYPE = 6; 
 
 const int RELATIONAL_PRECEDENCE = 20; 
 //const int LOGICAL_PRECEDENCE = 10; 

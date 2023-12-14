@@ -147,8 +147,12 @@ Table::Table(const char fileName[]){
     recordReader.read(savedInfo, 0); //reading the saved info 
     vector<string> savedFields = recordReader.get_record(); 
     buildIndexes(savedFields);
+   // cout<<"ctor fired\n"; 
     fields = savedFields; 
+    //cout<<"savedFields size: "<<savedFields.size()<<endl; 
     initTable(aFile); 
+    //cout<<"after init table\n"; 
+    //cout<<mTable[0]<<endl; 
     serial++;  
     aFile.close();
 }
@@ -172,15 +176,23 @@ Table::Table(const char fileName[], vector<string> fieldNames){
 }
 
 void Table::insert_into(vector<string> data){//insert the rparts of the record into the correct multimaps
+   // cout<<"before insertion: "<<endl; 
+   // cout<<mTable[0]<<endl; 
+   // cout<<"----------------------------\n"; 
+
     FileRecord recordedFiles = FileRecord(data); //write fiiles 
     fstream aFile; 
     open_fileRW(aFile, filName.c_str()); 
     aFile.seekg(0,aFile.end); 
     int recordNum = recordedFiles.write(aFile);
-
-    for(int i = 0; i < data.size(); i++){ 
+    //cout<<"recordNUm: "<<recordNum<<endl; 
+    for(int i = 0; i < data.size(); i++){
+       // cout<<"inserting: "<<data[i]<<endl; 
         mTable[i].insert(data[i], recordNum); 
     }
+    //cout<<"after insertion: "<<endl; 
+    //cout<<mTable[0]<<endl; 
+    //cout<<"----------------------------\n"; 
     aFile.close();
 }
 
@@ -342,6 +354,8 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
                 vector<long> left = recNums.pop(); 
                 vector<long> right = recNums.pop(); 
                 vector<long> received = eval(left, tokVal, right);
+                //cout<<"received recs: "; 
+                //printVec(received);  
                 recNums.push(received); 
                 //then do the intersect or combine for logcial  evals
             }
