@@ -107,6 +107,7 @@ long FileRecord::read(fstream& mFile, long recno){ //constraint assumption --> r
     for(int row = 0; row < MAX_ROWS; row++){ 
         mFile.read(*(_record + row), MAX_COLS + 1);
     } 
+    //cout<<"bytesRead: "<<mFile.tellg()<<endl; 
     return mFile.tellg(); //for now ??
 }//returns the number of bytes
 

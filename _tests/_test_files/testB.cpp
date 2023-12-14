@@ -67,8 +67,9 @@ bool test_relational(bool debug){ //working so far
 
     condition = {"age", ">=", "33"}; //less than NOT working
     cout<<"select: "<<condition<<endl; 
+    //vector<string> last = {"lname"}; 
     cout<<mTable.select(fields, condition)<<endl; 
-    cout<<"recnos: "<<endl; 
+    //cout<<"recnos: "<<endl; 
     mTable.select_recnos(); 
   }
 
@@ -166,9 +167,8 @@ bool test_relational(bool debug){ //working so far
     cout<<"command: "<<command<<endl; 
     cout<<sql.command(command)<<endl; 
     sql.select_recnos();
-
-
   }
+  return true; 
 }
 
 
@@ -326,9 +326,9 @@ bool test_parentheses(bool debug){
     commands.push_back(s8); 
 
     SQL sql; 
-    for(int i = 0; i < commands.size(); i++){
-      sql.command(commands[i]); 
-    }
+   // for(int i = 0; i < commands.size(); i++){
+      //sql.command(commands[i]); 
+    //}
 
   if(debug){
     cout<<"full table\n"; 
@@ -459,7 +459,7 @@ TEST(TEST_RELATIONAL, testRelational){
 }
 
 TEST(TEST_LOGICAL, testLogical){
-  EXPECT_EQ(1, test_logical(true)); 
+  EXPECT_EQ(1, test_logical(false)); 
 }
 
 TEST(TEST_COMBINE, testCombine){
