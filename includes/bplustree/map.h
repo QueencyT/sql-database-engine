@@ -156,5 +156,5 @@ private:
     BPlusTree<Pair<K, V> > map;
 };
 
-#endif 
+#endif
 
