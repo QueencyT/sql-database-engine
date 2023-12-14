@@ -72,6 +72,7 @@ class Table{
         vector<string> fields; 
         static int serial;
         string filName, saveName; 
+        int totalRecords; 
     
         //private helper funcs 
         //construction functions 
@@ -114,6 +115,7 @@ void Table::initTable(fstream& readThis){//init table from fiel
             mTable[n].insert(rec[n], i); 
         }
         bytes = recordReader.read(readThis, ++i);
+        totalRecords++; 
     }
 }
 
@@ -129,6 +131,7 @@ Table::Table(){
     fstream aFile; 
     open_fileW(aFile, "temp.bin"); //opening file //still havent done anything with field names
     serial++; 
+    totalRecords = 0; 
 }
 
 Table::Table(const char fileName[]){ 
@@ -136,6 +139,7 @@ Table::Table(const char fileName[]){
     FileRecord recordReader; 
     filName = fileName; 
     saveName = filName + "info.txt"; 
+    totalRecords = 0;
 
 
     open_fileRW(aFile, fileName); //opening file 
@@ -160,6 +164,7 @@ Table::Table(const char fileName[], vector<string> fieldNames){
     open_fileW(aFile, filName.c_str()); 
     open_fileW(info, saveName.c_str()); 
     saveInfo.write(info);
+    totalRecords = 0; 
 
     buildIndexes(fieldNames); 
     fields = fieldNames; 
@@ -178,6 +183,7 @@ void Table::insert_into(vector<string> data){//insert the rparts of the record i
     for(int i = 0; i < data.size(); i++){
         mTable[i].insert(data[i], recordNum); 
     }
+    totalRecords++; 
     aFile.close();
 }
 
@@ -422,21 +428,6 @@ Table Table::select_all(){
 }
 
 Table Table::select_all(vector<string> fields){ 
-    //cout<<"inside select all\n"; 
-    vector<long> recs; 
-    for(MMap<string,long>::Iterator beg = mTable[0].begin(); beg != mTable[0].end(); beg++){
-        MPair<string,long> received = *beg; 
-        recs = combine(recs, received.value_list); 
-    }
-    selectedVec = recs;
-    return vector_to_table(fields, recs); 
-}
-
-
-
-/*
-
-Table Table::select_all(vector<string> fields){ 
    // cout<<"inside select all\n"; 
     vector<long> recs; 
     for(int i = 0; i < totalRecords; i++){
@@ -444,7 +435,7 @@ Table Table::select_all(vector<string> fields){
     }
     selectedVec = recs;
     return vector_to_table(fields, recs); 
-}*/
+}
 
 #endif
 
