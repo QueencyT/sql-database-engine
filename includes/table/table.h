@@ -22,10 +22,10 @@
 #include "../../includes/table/constants.h"
 
 #include "../../includes/shunting_yard/shunting_yard.h"
+#include "../../includes/vector_utilities/vector_utilities.h"
 
 
 using namespace std; 
-
 
 class Table{
     public:
@@ -61,17 +61,14 @@ class Table{
             return outs; 
         }
 
-        //logical eval functions  //public for now
-        vector<long> combine(vector<long> left, vector<long> right);
-        vector<long> intersection(vector<long> left, vector<long> right);
-       
     private: 
         vector<MMap<string,long>> mTable; //each index represents a 
         Map<string, long> ourFields; 
         vector<long> selectedVec; //for select recnos (all the vecs in a table)
         vector<string> fields; 
         static int serial;
-        string filName, saveName; 
+        string filName, saveName;
+        int totalRecords;  
     
         //private helper funcs 
         //construction functions 
@@ -83,15 +80,6 @@ class Table{
         vector<long> eval(string field, string op, string key);//for logical
 
         vector<long> iterate(MMap<string, long>::Iterator start, MMap<string, long>::Iterator end);
-
-        
-
-        vector<string> printFields(vector<string> f){
-        for(int i = 0; i < f.size(); i++){
-            cout<<f[0]<<" "; 
-        }
-        cout<<endl; 
-    }
 }; 
 //a vector of multimaps 
 
@@ -114,6 +102,7 @@ void Table::initTable(fstream& readThis){//init table from fiel
             mTable[n].insert(rec[n], i); 
         }
         bytes = recordReader.read(readThis, ++i);
+        totalRecords++; 
     }
 }
 
@@ -126,12 +115,14 @@ void Table::buildIndexes(vector<string> fields){
 }
 
 Table::Table(){
+    totalRecords = 0; 
     fstream aFile; 
     open_fileW(aFile, "temp.bin"); //opening file //still havent done anything with field names
     serial++; 
 }
 
 Table::Table(const char fileName[]){ 
+    totalRecords = 0; 
     fstream aFile, savedInfo; 
     FileRecord recordReader; 
     filName = fileName; 
@@ -143,7 +134,6 @@ Table::Table(const char fileName[]){
     recordReader.read(savedInfo, 0); //reading the saved info 
     vector<string> savedFields = recordReader.get_record(); 
     buildIndexes(savedFields);
-   // cout<<"ctor fired\n"; 
     fields = savedFields; 
     initTable(aFile); 
 
@@ -152,6 +142,7 @@ Table::Table(const char fileName[]){
 }
 
 Table::Table(const char fileName[], vector<string> fieldNames){
+    totalRecords = 0; 
     FileRecord saveInfo = FileRecord(fieldNames); 
     fstream aFile, info;  
     filName = fileName;
@@ -178,13 +169,9 @@ void Table::insert_into(vector<string> data){//insert the rparts of the record i
     for(int i = 0; i < data.size(); i++){
         mTable[i].insert(data[i], recordNum); 
     }
+    totalRecords++; 
     aFile.close();
 }
-
-//vector<string> condition = {"(", "age", "<", "17", "or", "age", ">", "20", ")", "and", "lname", "=", "Jackson"};
-//OPERATORS 
-    //=, or, <, >, and, <=, >=
-//display only lname and age 
 
 void Table::printVec(vector<long> recnos){
     for(int i = 0; i < recnos.size(); i++){
@@ -216,17 +203,14 @@ vector<long> Table::eval(string field, string op, string key){
     }else if(op == ">="){
         recnos = iterate(lowBound, end); 
     }else if(op == "<="){
-       // cout<<"op: "<<op<<endl; 
         MPair<string, long> low; 
         if(lowBound != mTable[index].end())
             low = *lowBound; 
-       //cout<<"key: "<<key<<endl; 
-      // cout<<"low key: "<<low.key<<endl; 
        if(lowBound != mTable[index].end() && low.key == key){
         MMap<string,long>::Iterator next = lowBound++;
         recnos = iterate(beg, next); 
        }
-       else{//before there was no else just if //// recnos = knd
+       else{
         recnos = iterate(beg, lowBound); 
        }
     }else{
@@ -234,41 +218,6 @@ vector<long> Table::eval(string field, string op, string key){
     }
     selectedVec = recnos; 
     return recnos; 
-}
-
-
-vector<long> Table::combine(vector<long> left, vector<long> right){
-    Map<long, bool> leftVec;
-    bool found;  
-
-    for(int i = 0; i < left.size(); i++){
-        leftVec.insert(left[i], true); 
-    }
-
-    for(int i = 0; i < right.size();i++){ //in order or not hmm?
-        found = leftVec.get(right[i]); 
-        if(!found)//left doesn't already have this value
-            left.push_back(right[i]);
-    }
-    return left; 
-}
-
-vector<long> Table::intersection(vector<long> left, vector<long> right){//get what's in common with the two vecs
-    Map<long, bool> leftVec; 
-    vector<long> newVec; 
-    bool found; 
-
-    for(int i = 0; i < left.size(); i++){
-        leftVec.insert(left[i], true); 
-    }
-
-    for(int i = 0; i < right.size(); i++){
-        found = leftVec.get(right[i]); 
-        if(found)
-            newVec.push_back(right[i]); 
-    }
-
-    return newVec; 
 }
 
 vector<long> Table::eval(vector<long> left, string op, vector<long> right){//for logical stuff
@@ -284,10 +233,6 @@ vector<long> Table::eval(vector<long> left, string op, vector<long> right){//for
     return recnos; 
 }
 
-//age, 20, <, age, 17, >, and, lname, Gomex, =, or
-//relational --> works with vectors --> gives combined or intersected vectors 
-//logical --> works with strings --> gives vec 
-
 vector<long> Table::select_recnos(){
     printVec(selectedVec); 
     return selectedVec; 
@@ -298,8 +243,8 @@ Table Table::select(vector<string> fields, vector<string> infixCondition){
     Queue<Token*> infix = tok.createTokens(infixCondition); 
     ShuntingYard sy(infix); 
     Queue<Token*> post = sy.postfix();
-    cout<<"post: "; 
-    printQueue(post);  
+    //cout<<"post: "; //debugging stuff
+    //printQueue(post);  
     return select(fields, post); 
 }
 
@@ -312,49 +257,31 @@ Table Table::select(vector<string> fields, string field, string op, string key){
 
 //[5] [0 1 2 3 4 5 6]
 Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should prob not have any parentheses 
-    //fields --> what to display on table (only fname or only lname)
     Stack<string> toBeEvaluated; 
     Stack<vector<long>> recNums; 
     vector<long> mVec; 
+    Table returnTable; 
 
-    //cout<<"TABLE\n"; 
-    //cout<<*this<<endl; 
-    
-    //result vec
     //when evaluated, a vector of recnos will be returned.... 
     while(!postFix.empty()){
         Token* popped = postFix.pop(); 
         int type = popped->getType(); 
         string tokVal = popped->getToken(); 
-        //cout<<"popped: "<<tokVal<<endl; 
-        //cout<<"post fix stack: "; 
-       // printQueue(postFix); 
 
         if(type == RELATIONAL_TYPE){//relational, logical
             if(!toBeEvaluated.empty()){ //prob won't be empty 
-                //cout<<"inside relational\n"; 
                 string key = toBeEvaluated.pop(); //first pop key, second pop field name
-                //cout<<"key: "<<key<<endl; 
                 string field = toBeEvaluated.pop(); 
-                //cout<<"field: "<<field<<endl; 
                 vector<long> receivedNums = eval(field, tokVal, key); //popped at this point should be the operator
-                //cout<<"recs: "; 
-                //printVec(receivedNums); 
                 recNums.push(receivedNums); 
-                
-                //then send it into evaluate
             }
         }
         else if(type == LOGICAL_TYPE){
             if(!recNums.empty()){
-                //cout<<"inside logical\n"; 
                 vector<long> left = recNums.pop(); 
                 vector<long> right = recNums.pop(); 
                 vector<long> received = eval(left, tokVal, right);
-                //cout<<"received recs: "; 
-                //printVec(received);  
                 recNums.push(received); 
-                //then do the intersect or combine for logcial  evals
             }
         }
         else{//a regualr expession
@@ -362,20 +289,14 @@ Table Table::select(vector<string> fields, Queue<Token*> postFix){ //rpn should 
         }
     }
 
-    vector<long> res = recNums.pop(); 
-    selectedVec = res; 
-    Table returnTable = vector_to_table(fields, res);
+    if(!recNums.empty()){
+        vector<long> res = recNums.pop(); 
+        selectedVec = res; 
+        returnTable = vector_to_table(fields, res);
+    }
+
     return returnTable; 
-
-    //2 0
-
-    //2 and 0
-
-
-    
 }
-
-
 
 void Table::print_table() const{ 
     FileRecord recordedFiles;  
@@ -422,11 +343,9 @@ Table Table::select_all(){
 }
 
 Table Table::select_all(vector<string> fields){ 
-    //cout<<"inside select all\n"; 
     vector<long> recs; 
-    for(MMap<string,long>::Iterator beg = mTable[0].begin(); beg != mTable[0].end(); beg++){
-        MPair<string,long> received = *beg; 
-        recs = combine(recs, received.value_list); 
+    for(int i = 0; i < totalRecords; i++){
+        recs.push_back(i); 
     }
     selectedVec = recs;
     return vector_to_table(fields, recs); 

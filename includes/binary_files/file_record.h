@@ -15,8 +15,7 @@ public:
     FileRecord(); 
     FileRecord(vector<string> data); 
 
-    //when you construct a FileRecord, it's either empty or it
-    //  contains a word
+    //when you construct a FileRecord, it's either empty or it contains a word
 
     long write(fstream& outs);              //returns the record number
     long read(fstream& ins, long recno);    //returns the number of bytes
@@ -68,8 +67,7 @@ FileRecord::FileRecord(vector<string> data){ //vector of all the fields to write
         for(int i = 0; i < data[n].length(); i++){
             _record[n][i] = data[n][i]; 
         }
-       //_record[n][i] = '\0'; //making sure the arrays are null terminated
-    }//
+    }
 } 
 
 vector<string> FileRecord::get_record(){
@@ -100,7 +98,6 @@ long FileRecord::write(fstream& mFile){
 } //returns the record number
 
 long FileRecord::read(fstream& mFile, long recno){ //constraint assumption --> recno starts from 0 
-    //mFile.seekg((recno - 1) * (MAX_ROWS * (MAX_COLS + 1))); 
     mFile.seekg((recno) * (MAX_ROWS * (MAX_COLS + 1))); 
     int pos = mFile.tellg(); 
 

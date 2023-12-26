@@ -456,39 +456,6 @@ bool testTokenize(bool debug){
   }
 }
 
-bool test_combine(bool debug){ //combination and intersection functions are probably working
-  if(debug){
-    //26 78 51 3 14 93 58 30 72 62
-    //6 89 33 5 27 85 77 79 50 66
-    Table mTable;
-    vector<long> vec1 = {26, 78, 51, 3, 14, 93, 58, 30, 72, 62}; 
-    vector<long> vec2 = {6, 89, 33, 5, 27, 85, 77, 79, 50, 66}; 
-
-    cout<<"intersection of: \n"; 
-    cout<<"vec1: "; 
-    mTable.printVec(vec1); 
-    cout<<"vec2: "; 
-    mTable.printVec(vec2); 
-    vector<long> res = mTable.intersection(vec1, vec2); 
-    mTable.printVec(res); 
-
-    //1 11 5 14 10 9 13 15 3 12
-    //5 15 0 1 9 14 3 8 11 6
-
-    vec2 = {1, 11, 5, 14, 10, 9, 13, 15, 3, 12}; 
-    vec1 = {5, 15, 0, 1, 9, 14, 3, 12}; 
-
-    cout<<"intersection of: \n"; 
-    cout<<"vec1: "; 
-    mTable.printVec(vec1); 
-    cout<<"vec2: "; 
-    mTable.printVec(vec2); 
-    res = mTable.intersection(vec1, vec2); 
-    mTable.printVec(res); 
-    
-  }
-}
-
 
 TEST(TEST_RELATIONAL, testRelational){
   EXPECT_EQ(1, test_relational(true)); 
@@ -496,10 +463,6 @@ TEST(TEST_RELATIONAL, testRelational){
 
 TEST(TEST_LOGICAL, testLogical){
   EXPECT_EQ(1, test_logical(true)); 
-}
-
-TEST(TEST_COMBINE, testCombine){
-  EXPECT_EQ(1, test_combine(false)); 
 }
 
 TEST(TEST_PARENTHESES, testParen){

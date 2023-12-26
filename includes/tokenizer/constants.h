@@ -30,14 +30,13 @@ const int TOKEN_END = -2;
 const int SUCCESS_STATES[] = {-1, TOKEN_ALPHA, TOKEN_NUMBER,-1, -1, TOKEN_SPACE, TOKEN_PUNC}; 
 
 //must recheck these to make sure 
-const int COMMAND_STATES[] = {0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0}; 
-const int TABLE_NAME_STATES[] = {0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0};
+const int COMMAND_STATES[] = {0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,1}; //18 --> get state 
+const int TABLE_NAME_STATES[] = {0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1}; //21 table name state
 const int WHERE_STATE[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}; 
 const int VALUES_STATE[] = {0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}; 
 const int FIELD_NAME_STATE[] = {0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1};
 const int CONDITION_STATE[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0}; 
 const int COL_STATE[] = {0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0}; 
-
 
 //STRING STATES 
 const int MAKE = 1; 
@@ -52,4 +51,5 @@ const int FROM = 13;
 const int WHERE = 14;
 const int ALL = 12; 
 const int SYMBOL = 15; 
+const int GET = 18; 
 #endif

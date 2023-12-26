@@ -13,50 +13,32 @@ class Parser{
         void set_string(string s); 
         void getTokens(); //public for now
         MMap<string,string> parse_tree(); 
+        int getLastState(){return lastState;}
+        bool isCommandValid(){return validCommand;}
+
     private: 
         string expression; 
         vector<string> tokens; 
         Map<string, int> keywordMap; 
-        int stateMachine[MAX_ROWS][MAX_COLUMNS]; //for now 
-        MMap<string,string> ptree; //building the ptree
-
+        int stateMachine[MAX_ROWS][MAX_COLUMNS]; 
+        MMap<string,string> ptree;
+        bool validCommand; 
+        int lastState; 
         
         void printTokens(vector<string> toks); 
         void makeTable();
-        void buildTree(); 
         void initKeywords(); 
+        void stateDecider(int state, int currPos); 
 
-        bool isCommandState(int state){
-            return COMMAND_STATES[state]; 
-        }
-
-        bool isTableNameState(int state){
-            return TABLE_NAME_STATES[state]; 
-        }
-
-        bool isWhereState(int state){
-            return WHERE_STATE[state]; 
-        }
-
-        bool isValueState(int state){
-            return VALUES_STATE[state]; 
-        }
-
-        bool isConditionState(int state){
-            return CONDITION_STATE[state]; 
-        }
-
-        bool isFieldNameState(int state){
-            return FIELD_NAME_STATE[state]; 
-        }
-
-        bool isKeyword(string token){
-            return keywordMap.contains(token); 
-        }
-
-        bool isColState(int state){
-            return COL_STATE[state]; 
-        }
+        //boolean helper funcs
+        bool isCommandState(int state){return COMMAND_STATES[state];}
+        bool isTableNameState(int state){return TABLE_NAME_STATES[state];}
+        bool isWhereState(int state){return WHERE_STATE[state];}
+        bool isValueState(int state){return VALUES_STATE[state];}
+        bool isConditionState(int state){return CONDITION_STATE[state];}
+        bool isFieldNameState(int state){return FIELD_NAME_STATE[state];}
+        bool isKeyword(string token){return keywordMap.contains(token);}
+        bool isColState(int state){return COL_STATE[state];}
 
         int getNextState(string token){
             if(isKeyword(token)){
@@ -97,6 +79,7 @@ void Parser::initKeywords(){
     keywordMap.insert("from", 13); 
     keywordMap.insert("where", 14); 
     keywordMap.insert("values", 9); 
+    keywordMap.insert("get", 18); 
 }
 
 void Parser::makeTable(){
@@ -125,7 +108,6 @@ void Parser::makeTable(){
     mark_cell(0,stateMachine,MAKE,1); 
     mark_cell(1,stateMachine,TABLE,2); 
     mark_cell(2,stateMachine,SYMBOL,3); 
-    //mark_cell(3,stateMachine,SYMBOL,3);
     mark_cell(3,stateMachine,FIELDS, 4);
     mark_cell(4,stateMachine,SYMBOL,5); 
     mark_cell(5,stateMachine,SYMBOL,5);  
@@ -137,6 +119,12 @@ void Parser::makeTable(){
     mark_cell(8,stateMachine,VALUES, 9);  
     mark_cell(9,stateMachine,SYMBOL,10); 
     mark_cell(10,stateMachine,SYMBOL,10); 
+
+    //get fields stateMachine path 
+    mark_cell(0,stateMachine,GET, 18); 
+    mark_cell(18,stateMachine,FIELDS,19); 
+    mark_cell(19,stateMachine,FROM,20); 
+    mark_cell(20,stateMachine,SYMBOL,21); //table name state
 }
 
 
@@ -146,73 +134,70 @@ void Parser::set_string(string s){
 }
 
 void Parser::getTokens(){//gets the tokens without punc, and pushes it into tokens
-    //cout<<"exp: "<<expression<<endl; 
     char exp[expression.length() + 1]; 
     strcpy(exp, expression.c_str()); 
-    STokenizer tokenizer(exp); 
-    //const string newExp = expression; 
-    //tokenizer.set_string(newExp.c_str()); 
+    STokenizer tokenizer(exp);  
     string tokVal; 
     tokenizer >> tokVal;
     while(tokenizer.more()){  
         if(!tokVal.empty()){
             tokens.push_back(tokVal); 
-            //cout<<"pushing back: |"<<tokVal<<"|"<<endl; 
-        }
-          
+        } 
         tokenizer >> tokVal; //has the period 
+    } 
+}
+
+void Parser::stateDecider(int currState, int currPos){
+    lastState = currState; //the last state we were on --> from etc 
+    if(isCommandState(currState)){//have an array with all the command states //if curr state is a command state
+        ptree.insert("command", tokens[currPos]); 
     }
-   //printTokens(tokens); 
+    else if(isTableNameState(currState)){//one of the table name states  
+        ptree.insert("table_name", tokens[currPos]);  
+    }
+    else if(isColState(currState)){
+        ptree.insert("col", tokens[currPos]);  
+    }
+    else if(isWhereState(currState)){
+        ptree.insert("where", "yes"); 
+    }
+    else if(isConditionState(currState)){
+        ptree.insert("condition", tokens[currPos]); 
+    }
+    else if(isFieldNameState(currState)){
+        ptree.insert("fields", tokens[currPos]);
+    }
+    else if(isValueState(currState)){
+        ptree.insert("values", tokens[currPos]); 
+    }
 }
 
 
 
 MMap<string,string> Parser::parse_tree(){
-    int currState = 0, nextState = 0; 
+    int currState = 0, nextState = 0, i; 
     string val;
     MMap<string,string> returnThis; 
+    lastState = 0;
 
-    //select * from student where lname = Yang or major = CS and age < 23 or lname = Jackson
-
-    //printTokens(tokens); //when I do print it, suddenly there is space 
-
-    if(isKeyword(tokens[0]))
+    if(!tokens.empty() && isKeyword(tokens[0]))
         currState = keywordMap.get(tokens[0]);
 
-    for(int i = 0; i < tokens.size() && currState != -1; i++){
-        //cout<<"tokens: "<<tokens[i]<<"curr state: "<<currState<<endl; //select has a space in it  
+    for(i = 0; i < tokens.size() && currState != -1; i++){
         if(i < tokens.size() - 1)
               nextState = getNextState(tokens[i+1]);  
-
-        if(isCommandState(currState)){//have an array with all the command states //if curr state is a command state
-            ptree.insert("command", tokens[i]); 
-        }
-        else if(isTableNameState(currState)){//one of the table name states  
-            ptree.insert("table_name", tokens[i]); 
-        }
-        else if(isColState(currState)){
-            ptree.insert("col", tokens[i]); 
-        }
-        else if(isWhereState(currState)){
-            ptree.insert("where", "yes"); 
-        }
-        else if(isConditionState(currState)){
-            ptree.insert("condition", tokens[i]); 
-        }
-        else if(isFieldNameState(currState)){
-            ptree.insert("fields", tokens[i]);
-        }
-        else if(isValueState(currState)){
-            ptree.insert("values", tokens[i]); 
-        }
+        stateDecider(currState, i); 
         currState = stateMachine[currState][nextState]; //from currState we got this newState where will we go
     }
+
+    if(currState == -1 &&  lastState == 14 && i < tokens.size()){ 
+        const int WHERE_MISSING = 201; 
+        lastState = WHERE_MISSING; 
+    }
+
     returnThis = ptree;
     ptree.clear();
     tokens.clear();
-    //cout<<"return this\n"; 
-   // cout<<returnThis<<endl; 
-
     return returnThis; 
 }//if we fail, reset ptree, reset everything, 
 
@@ -221,8 +206,5 @@ void Parser::printTokens(vector<string> toks){
       cout<<"token "<<i<<": |"<<toks[i]<<"|"<<endl; 
     }
 }
-
-//repushing comment
-
 
 #endif 
