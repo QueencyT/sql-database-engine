@@ -21,7 +21,6 @@ class Interaction{
 
     //cout helper functions
     void printHelp(); 
-    void printCommandBanner(); 
     void splashScreen(); 
     void helpSplashScreen(); 
 
@@ -175,13 +174,6 @@ void Interaction::splashScreen(){
     cout<<"    (.  .)  ||\n"; 
     cout<<"    /     > ||\n";
 }
-
-void Interaction::printCommandBanner(){
-    cout<<"+------------------------------------------------------------+\n";
-    cout<<"|                        Your Command                        |\n"; 
-    cout<<"+------------------------------------------------------------+\n";
-}
-
 
 void Interaction::decider(string command){
     if(command == "exit"){
