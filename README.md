@@ -1,7 +1,5 @@
 
-# SQL DATABASE
-
-## Name: <ins> Queency Tan </ins>
+# SQL DATABASE - QUEENCY TAN
 
 # PROGRAM VIDEOS
 
