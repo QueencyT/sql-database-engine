@@ -73,7 +73,7 @@ void Error_Handler::init_errors(){
     errorMap.insert(MISSING_VALUES_ERROR, "ERROR: missing values. Please insert at least one value when inserting into table\n"); 
     //select table error path 
     errorMap.insert(MISSING_FIELDS_ERROR, "ERROR: missing fields. Please enter at least one field when selecting from the table\n"); 
-    errorMap.insert(MISSING_KEYWORD_FROM_ERROR, "ERROR: missing keyword 'from' after your fields"); 
+    errorMap.insert(MISSING_KEYWORD_FROM_ERROR, "ERROR: missing keyword 'from' after your fields\n"); 
     errorMap.insert(MISSING_KEYWORD_WHERE_ERROR, "ERROR: missing keyword 'where' after your table name\n"); 
     errorMap.insert(MISSING_CONDITION_ERROR, "ERROR: missing a condition after 'where'\n"); 
     //get fields error path 
@@ -122,7 +122,7 @@ bool Error_Handler::inError(){
 void Error_Handler::generalErrors(int lastSuccessState){  
     if(tableName == "" || lastSuccessState == TABLE || lastSuccessState == INTO || lastSuccessState == FROM){ 
         hasError = true; 
-        errorMessage = "ERROR: table name is missing/invalid. Please remember you cannot have a keyword as your table name. For a list of keywords, enter '?'"; 
+        errorMessage = "ERROR: table name is missing/invalid. Please remember you cannot have a keyword as your table name. For a list of keywords, enter '?'\n"; 
         
     }
     else if((command == "select" || command == "insert" || command == "get") && !foundTableName(tableName)){

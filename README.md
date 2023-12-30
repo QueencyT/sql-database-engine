@@ -23,7 +23,7 @@ This project uses data structures such as BPlusTrees, MultiMaps, and Maps for th
 ![Alt text](image-9.png)
 
 # Get Fields Command: 
-![Alt text](<Screenshot 2023-12-26 012527.png>)
+![Alt text](image-13.png)
 
 # Help Desk:
 Picture of Help Desk (which you can get by entering '?')
@@ -33,7 +33,7 @@ A Guide to all the Commands (which you can get by entering 'A')
 
 # Error Checking: 
 Sample of some error-checking features
-![Alt text](<Screenshot 2023-12-26 011909.png>)
+![Alt text](image-14.png)
 
 ## EXTRA INFO: 
 # Technical Details: 
