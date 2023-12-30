@@ -44,8 +44,7 @@ Operator::Operator(int type, string val) : Token(type, val){
     }
     else{
         //cout<<"setting parentheses prec: \n"; 
-        //
-        cout<<"INVALID OPERATOR TYPE: OPERATOR NOT LOGICAL/RELATIONAL\n"; 
+        //cout<<"INVALID OPERATOR TYPE: OPERATOR NOT LOGICAL/RELATIONAL\n"; 
     }
 }
 
@@ -64,7 +63,7 @@ Operator::Operator(int opType, string val, int prec) : Token(opType, val){
     }
     else{
         //cout<<"setting parentheses prec: \n"; 
-        cout<<"INVALID OPERATOR TYPE: OPERATOR NOT LOGICAL/RELATIONAL\n"; //if here we are parentheses 
+        //cout<<"INVALID OPERATOR TYPE: OPERATOR NOT LOGICAL/RELATIONAL\n"; //if here we are parentheses 
         //precedence = prec; 
     }
 }

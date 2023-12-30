@@ -329,7 +329,28 @@ bool test_parentheses(bool debug){
     for(int i = 0; i < commands.size(); i++){
       sql.command(commands[i]); 
     }
+  
+  //Make table --> 
+  /* 
+  string s1 = "make table student fields fname, lname, major, age"; 
+  string s2 = "insert into student values Flo, Yao, CS, 20"; 
+  string s3 = "insert into student values \"Flo\", \"Jackson\", Math,21"; 
+  string s4 = "insert into student values Calvin, Woo, Physics,22"; 
+  string s5 = "insert into student values \"Anna Grace\", \"Del Rio\", CS, 22"; 
+  */
 
+  //select command list for video 
+  //command = "select * from student"
+  //command = "select fname, lname from student"
+  //command = "select * from student where ((age <30 and age > 20) and major = Communications) or ((major = CS or major = Physics))";
+  //command = "select fname,lname,age from student where age <30 and ((major = CS or major = Physics) and (lname < Y))";
+  //command = "select * from student where lname = \"Yang\" or major = CS and age < 23 or lname = Jackson"
+
+  //then help desk 
+
+  //then error checking
+  
+  
   if(debug){
     cout<<"full table\n"; 
     cout<<sql.command("select * from student")<<endl; 
@@ -486,8 +507,6 @@ TEST(TEST_STUB, TestStub) {
 
   EXPECT_EQ(1, test_stub(false));
 }
-
-
 
 
 int main(int argc, char **argv) {

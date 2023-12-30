@@ -214,7 +214,7 @@ vector<long> Table::eval(string field, string op, string key){
         recnos = iterate(beg, lowBound); 
        }
     }else{
-        cout<<"INVALID OPERAND TYPE\n"; 
+        //cout<<"INVALID OPERAND TYPE\n"; 
     }
     selectedVec = recnos; 
     return recnos; 
@@ -227,7 +227,7 @@ vector<long> Table::eval(vector<long> left, string op, vector<long> right){//for
     }else if(op == "or"){//union
         recnos = combine(left, right); 
     }else{
-        cout<<"INVALID OPERAND TYPE\n"; 
+       // cout<<"INVALID OPERAND TYPE\n"; 
     }
     selectedVec = recnos;
     return recnos; 

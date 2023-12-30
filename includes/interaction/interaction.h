@@ -105,7 +105,9 @@ void Interaction::decider(){
     cout<<"                               +--------------------------------------------------------------------------------+\n";
     cout<<"                               |      PRESS H - to go back to help desk | PRESS E - to go back to program       |\n";
     cout<<"                               +--------------------------------------------------------------------------------+\n";
+    cout<<">"; 
     cin>>userAns; 
+    
 
     if(userAns == 'E'){
         start(); 
@@ -197,23 +199,17 @@ void Interaction::decider(string command){
 
 void Interaction::start(){
     string command; 
+    splashScreen(); 
 
     while(!endProgram){
-        cout<<endl; 
-        system("cls");
-       splashScreen(); 
-       printCommandBanner(); 
+       cout<<"Enter a command: Press exit to end program, press ? for help\n";
+       cout<<">"; 
        getline(cin, command); 
        decider(command);
         
         while(!endProgram && sql.inError()){
+            cout<<">";
             getline(cin,command); 
-            decider(command);
-        }
-
-        if(!endProgram){
-            cout<<"Continue to next command? : press 'enter' if yes, type 'exit' if no\n"; 
-            getline(cin,command);
             decider(command);
         }
    }
