@@ -365,12 +365,11 @@ void BPlusTree<T>::fix_excess(int fatIndex){
 template <typename T>
 void BPlusTree<T>::insert(const T& entry){ 
     T* found = find_ptr(entry);  
-   
     if(found && dups_ok){//update 
         *found = *found + entry; //for multimap it should add to vec
         return; 
     }
-  
+   
     loose_insert(entry);
 
     if(data_count > MAXIMUM){//if the root is in excess, //fixing root excess 
@@ -525,9 +524,9 @@ BPlusTree<T>* BPlusTree<T>::fix_shortage(int shortIndex){ //we return what we ju
         left = subset[shortIndex - 1];
     bool STEAL_RIGHT = (right && right->data_count > MINIMUM), STEAL_LEFT = left && left->data_count > MINIMUM, BEGIN_CASE = (shortIndex == 0); 
 
-    if(STEAL_RIGHT){//can steal from right 
+    if(STEAL_RIGHT){//can steal from right
         transfer_left(shortIndex); 
-        returned = shortChild;    
+        returned = shortChild;  
     }
     else if(STEAL_LEFT){//can steal from left
         transfer_right(shortIndex); 
@@ -572,14 +571,11 @@ void BPlusTree<T>::loose_remove(const T& entry){
             bool replaced = false; 
 
             if(goToIndex < data_count && data[goToIndex] != entry && !replaced){//find entry. which should be in children
-               // cout<<"search in origin\n"; 
                 for(int i = 0; i < data_count; i++){//search ourselves
                     if(data[i] == entry){
-                       // cout<<"found in origin\n";
                         T small; 
                         right = subset[i + 1]; 
                         right->get_smallest(small); 
-                       // cout<<"replacing: "<<data[i]<<" with "<<small<<endl;
                         data[i] = small;
                         replaced = true; 
                         break; 
@@ -752,8 +748,6 @@ void BPlusTree<T>::print_tree(int level, ostream &outs) const{
         if(i!= 0){
             outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"dc: "<<data_count<<"cc: "<<child_count; //<<" a: "<<this; 
             outs<<"next?: "<<boolalpha<<(next == nullptr);
-            //if(next)
-                //outs<<"next: "<<next->data[0];  
             outs<<endl; 
         }
     }
@@ -836,7 +830,4 @@ T* BPlusTree<T>::find_ptr(const T& entry){ //find should be fin
     return foundPtr; 
 }
 //return a pointer to this key. // NULL if not there.
-
-
-//update next
 #endif

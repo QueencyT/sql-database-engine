@@ -3,12 +3,11 @@
 
 #include "../../includes/bplustree/bplustree.h"
 #include "../../includes/tokenizer/constants.h"
+#include "../../includes/error/error_constants.h"
+#include "../../includes/bplustree/map.h"
 #include <vector>
 #include <fstream> 
 
-const int MAKE_TABLE_NAME = 3; 
-const int INSERT_TABLE_NAME = 8;
-const int GET_FIELD_FROM = 19; 
 const string table_names = "table_names";  
 
 using namespace std; 
@@ -23,10 +22,8 @@ class Error_Handler{
         bool checkFields(vector<string> recFields, string& invalidField);
         void checkCondition(vector<string> condition);  
         bool inError();
-        
         void addTableName(string tableName);
         bool foundTableName(string tableName);
-
         string getErrorMessage(){return errorMessage;}
 
         void init_token_types(){
@@ -41,20 +38,11 @@ class Error_Handler{
 
     private:
         MMap<string,string> statementTree; 
-        Map<string,int> relationalTypes; //a map of relational operators, a map of logical operators, a map of 
+        Map<string,int> relationalTypes; 
         Map<string,int> logicalTypes; 
+        Map<int,string> errorMap; 
         bool hasError; 
         string errorMessage;
-        //helper functions 
-        void makeTableError(int lastSuccessState); 
-        void insertError(int lastSuccessState); 
-        void selectError(int lastSuccessState);
-        void getError(int lastSuccessState); 
-        void generalErrors(int lastSuccessState); 
-        void increment(int* typesArr, string tok); 
-
-        bool searchFile(string fileName, string findThis); 
-        void extract(); 
 
         string command; 
         string tableName; 
@@ -62,14 +50,45 @@ class Error_Handler{
         vector<string> cols; 
         vector<string> condition; 
         vector<string> fields; 
+
+        //helper functions 
+        void generalErrors(int lastSuccessState); 
+        void increment(int* typesArr, string tok); 
+        bool searchFile(string fileName, string findThis); 
+        void extract(); 
+        void init_errors(); 
 };
 
+
+void Error_Handler::init_errors(){
+    //last success state --> error code  // Map<int,string> errorMap; //error code, error message
+    errorMap.insert(INVALID_COMMAND_ERROR, "ERROR: no command or invalid command was entered. Remember all commands must be typed in lowercase\n"); //last success state 0
+    //make table error path
+    errorMap.insert(MISSING_KEYWORD_TABLE_ERROR, "ERROR: missing keyword 'table' after make\n"); //make table errors
+    errorMap.insert(MISSING_KEYWORD_FIELDS_ERROR, "ERROR: missing keyword 'fields' after your table name\n"); 
+    errorMap.insert(MISSING_FIELD_NAMES_ERROR, "ERROR: missing field names. Please enter at least one field name when making a table\n"); 
+    //insert table error path 
+    errorMap.insert(MISSING_KEYWORD_INTO_ERROR, "ERROR: missing keyword 'into' after insert\n"); 
+    errorMap.insert(MISSING_KEYWORD_VALUES_ERROR, "ERROR: missing keyword 'values' after your table name\n"); 
+    errorMap.insert(MISSING_VALUES_ERROR, "ERROR: missing values. Please insert at least one value when inserting into table\n"); 
+    //select table error path 
+    errorMap.insert(MISSING_FIELDS_ERROR, "ERROR: missing fields. Please enter at least one field when selecting from the table\n"); 
+    errorMap.insert(MISSING_KEYWORD_FROM_ERROR, "ERROR: missing keyword 'from' after your fields"); 
+    errorMap.insert(MISSING_KEYWORD_WHERE_ERROR, "ERROR: missing keyword 'where' after your table name\n"); 
+    errorMap.insert(MISSING_CONDITION_ERROR, "ERROR: missing a condition after 'where'\n"); 
+    //get fields error path 
+    errorMap.insert(MISSING_KEYWORD_FIELDS_GET_ERROR,"ERROR: missing keyword 'fields' after 'get'\n"); 
+    errorMap.insert(MISSING_KEYWORD_FROM_GET_ERROR, "ERROR: missing keyword 'from' after 'fields'\n"); 
+}
+
 Error_Handler::Error_Handler(){
+    init_errors();
     init_token_types(); 
     hasError = false; 
 }
 
 Error_Handler::Error_Handler(MMap<string, string> stateTree){
+    init_errors(); 
     init_token_types();
     hasError = false; 
     statementTree = stateTree; 
@@ -93,22 +112,15 @@ void Error_Handler::extract(){
         cols = statementTree.get("cols"); 
 
     if(statementTree.contains("condition"))
-        condition = statementTree.get("conditon"); 
+        condition = statementTree.get("condition"); 
 }
 
 bool Error_Handler::inError(){
     return hasError;
 }
 
-//maybe an extract method --> extracts everything and checks it 
-
-void Error_Handler::generalErrors(int lastSuccessState){
-    if(statementTree.empty()){//this is the problem right here 
-        hasError = true; 
-        errorMessage = "ERROR: no command or invalid command was entered. Remember all commands must be typed in lowercase\n"; 
-        return; 
-    }
-    else if(tableName == "" || lastSuccessState == TABLE || lastSuccessState == INTO || lastSuccessState == FROM){
+void Error_Handler::generalErrors(int lastSuccessState){  
+    if(tableName == "" || lastSuccessState == TABLE || lastSuccessState == INTO || lastSuccessState == FROM){ 
         hasError = true; 
         errorMessage = "ERROR: table name is missing/invalid. Please remember you cannot have a keyword as your table name. For a list of keywords, enter '?'"; 
         
@@ -117,82 +129,23 @@ void Error_Handler::generalErrors(int lastSuccessState){
         errorMessage = "ERROR: trying to insert/select/get fields from a non-existent table. Please double-check your spelling and capitalization\n"; 
         hasError = true; 
     }
-}
-
-void Error_Handler::makeTableError(int lastSuccessState){
-    if(lastSuccessState == MAKE){
-        hasError = true; 
-        errorMessage = "ERROR: missing keyword 'table' after make\n"; 
-    }
-    else if(lastSuccessState == MAKE_TABLE_NAME && !hasError){//3 being the table name state
-        hasError = true; 
-        errorMessage = "ERROR: missing keyword 'fields' after your table name\n"; 
-    }
-    else if(command == "make" && !statementTree.contains("col") && !hasError){
-        hasError = true; 
-        errorMessage = "ERROR: missing field names. Please enter at least one field name when making a table\n"; 
-    }
-    else if(command == "make" && foundTableName(tableName)){ //table already exists 
+    else if(command == "make" && foundTableName(tableName)){ 
         hasError = true; 
         errorMessage = "ERROR: table already exists. If you'd like to overwrite the table, please delete the file and then call the make command\n"; 
     }
-}
-
-void Error_Handler::insertError(int lastSuccessState){
-    if(lastSuccessState == INSERT){
-        hasError = true; 
-        errorMessage = "ERROR: missing keyword 'into' after insert\n"; 
-    }
-    else if(lastSuccessState == INSERT_TABLE_NAME && !hasError){
-        hasError = true; 
-        errorMessage = "ERROR: missing keyword 'values' after your table name\n"; 
-    }
-    else if(lastSuccessState == VALUES && !hasError){
-        hasError = true; 
-        errorMessage = "ERROR: missing values. Please insert at least one value when inserting into table\n"; 
-    }
-}
-
-void Error_Handler::selectError(int lastSuccessState){
-    if(lastSuccessState == SELECT){
-        hasError = true; 
-        errorMessage = "ERROR: missing fields. Please enter at least one field when selecting from the table\n"; 
-    }
-    else if(lastSuccessState == ALL || lastSuccessState == 17){ //17 is a field state
-        hasError = true; 
-        errorMessage = "ERROR: missing keyword 'from' after your fields"; 
-    }
-    else if(lastSuccessState == 201){
-        hasError = true; 
-        errorMessage = "ERROR: missing keyword 'where' after your table name\n"; 
-    }
-    else if(statementTree.contains("where") && !statementTree.contains("condition")){
-        hasError = true; 
-        errorMessage = "ERROR: missing a condition after 'where'\n"; 
-    }
-
-    if(statementTree.contains("condition")){//we always check the condition whenever we have it no matter what
+    else if(!condition.empty()){//we always check the condition whenever we have it no matter what 
         checkCondition(condition); 
     }
 }
 
-void Error_Handler::getError(int lastSuccessState){
-    if(lastSuccessState == GET){
-        hasError = true; 
-        errorMessage = "ERROR: missing keyword 'fields' after 'get'\n"; 
-    }
-    else if(command == "get" and lastSuccessState == GET_FIELD_FROM){//field before from state
-        hasError = true; 
-        errorMessage = "ERROR: missing keyword 'from' after fields\n"; 
-    }
-}
+bool Error_Handler::checkForErrors(int lastSuccessState){ //error checker //ast success state --> error code
+    generalErrors(lastSuccessState);
 
-bool Error_Handler::checkForErrors(int lastSuccessState){ //error checker
-    generalErrors(lastSuccessState); //checking for general errors 
-    makeTableError(lastSuccessState); //checking for error in make table path
-    insertError(lastSuccessState); //checking for error in insert path 
-    selectError(lastSuccessState); //checking for error in select path
-    getError(lastSuccessState); //checking for error in get path
+    if(errorMap.contains(lastSuccessState)){
+        hasError = true; 
+        errorMessage = errorMap.get(lastSuccessState); 
+    }
+
     return hasError; 
 }
 
@@ -200,13 +153,13 @@ bool Error_Handler::checkForErrors(int lastSuccessState){ //error checker
 bool Error_Handler::checkForErrors(vector<string> recFields){//called in sql --> for insert and select
     vector<string> values = statementTree.get("values"); 
 
-    if(command == "select" && !fields.empty() && !hasError){
+    if(command == "select" && !fields.empty() && !hasError){ //custom
         string invalidField; 
         hasError = !checkFields(recFields, invalidField); //checks fields to make sure all
         if(hasError)
             errorMessage = "ERROR: " + invalidField + " is not a valid field name.\n"; 
     }
-    if(command == "insert" && values.size() != recFields.size()){
+    if(command == "insert" && values.size() != recFields.size()){ //custom 
         hasError = true; 
         errorMessage = "ERROR: incorrect number of values. Make sure you are inserting values for all your fields. Also make sure if you want a value to be treated as one value that you must put it in quotes " "\n"; 
     }
@@ -220,6 +173,7 @@ bool Error_Handler::checkFields(vector<string> recFields, string& invalidField){
         return true; 
 
     for(int i = 0; i < fields.size(); i++){ 
+         invalidField = fields[i]; 
         for(int n = 0; n < recFields.size(); n++){
             if(fields[i] == recFields[n])
                 return true; 

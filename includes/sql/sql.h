@@ -112,7 +112,7 @@ Table SQL::selectCommand(string tableName){ //trying to select from a table that
     vector<string> fields = statementTree.get("fields");  
     mTable = Table(tableName.c_str());
     allFields = mTable.getFields(); 
-    
+
     errorHandler.checkForErrors(allFields); 
     if(errorHandler.inError()){
         cout<<errorHandler.getErrorMessage(); 
@@ -120,20 +120,20 @@ Table SQL::selectCommand(string tableName){ //trying to select from a table that
     } 
 
     if(selectAll() && !hasCondition()){
-        cout<<"select all with no condition\n"; 
+        //select all with no condition
         return mTable.select_all(allFields);  
     }
     else if(selectAll() && hasCondition()){
-        cout<<"select all with condition\n"; 
+        //select all with condition
         vector<string> condition = statementTree.get("condition");
         return mTable.select(allFields, condition);
     }
     else if(!selectAll() && !hasCondition()){
-        cout<<"regular select with no condition\n"; 
+        //regular select with no condition
         return mTable.select_all(fields); 
     }
     else{//if not select all and has a condition
-        cout<<"regular select with condition\n"; 
+        //regular select with condition
         vector<string> condition = statementTree.get("condition");
         return mTable.select(fields, condition); 
     }

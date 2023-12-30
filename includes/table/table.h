@@ -62,7 +62,7 @@ class Table{
         }
 
     private: 
-        vector<MMap<string,long>> mTable; //each index represents a 
+        vector<MMap<string,long>> mTable; //each index represents a field --> age, fname, lname --> within those multimaps are specific values (age --> 21, 20). Long is for rec nos
         Map<string, long> ourFields; 
         vector<long> selectedVec; //for select recnos (all the vecs in a table)
         vector<string> fields; 

@@ -97,7 +97,7 @@ void Parser::makeTable(){
     mark_cell(11,stateMachine,SYMBOL, 17); //aka if we get a field name
     mark_cell(17,stateMachine,SYMBOL,17); 
     mark_cell(17,stateMachine,FROM, 13); 
-    mark_cell(15,stateMachine,SYMBOL, 16); 
+    mark_cell(15,stateMachine,SYMBOL, 16); //condition state
     mark_cell(16,stateMachine,SYMBOL,16); 
     mark_cell(12,stateMachine,FROM,13); 
     mark_cell(13,stateMachine,SYMBOL,14);
@@ -179,6 +179,7 @@ MMap<string,string> Parser::parse_tree(){
     string val;
     MMap<string,string> returnThis; 
     lastState = 0;
+
 
     if(!tokens.empty() && isKeyword(tokens[0]))
         currState = keywordMap.get(tokens[0]);
