@@ -5,10 +5,10 @@
 
 # PROGRAM VIDEOS
 
-# MAKING/INSERTING INTO TABLE VIDEO
+# Making/Inserting Into Table Video
 https://github.com/barkeshli-CS008-classroom/99_99_final_project-QueencyT/assets/122432408/e6cfb4d3-ba29-487e-9f22-1de80ad202d6
 
-# SELECTING FROM TABLE VIDEO
+# Selecting From Table Video
 https://github.com/barkeshli-CS008-classroom/99_99_final_project-QueencyT/assets/122432408/aa8d1bd7-4af8-4874-93c2-7fa719281c9d
 
 # PROJECT DESCRIPTION
