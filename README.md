@@ -43,7 +43,7 @@ https://github.com/user-attachments/assets/8f2fcecc-c925-45d7-b983-759f36b3ed48
 ## Error-Checking Showcase
 https://github.com/user-attachments/assets/38f8194d-862e-4927-8853-85971e665e71
 
-# Help Desk Showcase
+## Help Desk Showcase
 Picture of Help Desk (which you can get by entering '?')
 ![Alt text](image-2.png)
 A Guide to all the Commands (which you can get by entering 'A')
