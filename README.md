@@ -1,15 +1,41 @@
+# SQL Database Engine
 
-# SQL DATABASE
+**A custom SQL-like database engine developed in C++, featuring B+ Tree indexing, binary file storage, state-machine-based SQL parsing, and complex query evaluation using the Shunting Yard algorithm.**
 
-## Name: <ins> Queency Tan </ins>
+## Overview
 
-# PROJECT DESCRIPTION
-This project is an SQL Database made from scratch. Users can input SQL commands such as MAKE TABLE, SELECT, and INSERT INTO in order to create and modify their tables. For example, if the user inputted a command such as ‘make table student fields fname, lname, age’ a table with the name student will be created with the fields fname, name, and age. The other commands are equally straightforward. If the user inputted a command such as ‘select * from student where age > 21’, the program will find all your records with an age greater than 21, put it into a table, and display it for you. You can also choose to display only certain fields by inputting a command such as ‘select age,lname from student where age > 21’. This command will retrieve the same values as the previous select command except instead of displaying all the fields, it will display only the ‘age’ and ‘lname’ of the selected records. Lastly, if the user inputted a command such as ‘insert into student values Jane, Doe, 24’, the program will create a new record with those values and insert it into your table.
+SQL Database Engine is a database management system developed from scratch in C++ that supports table creation, record insertion, and data retrieval through SQL-like commands without relying on an existing database engine.
 
-If after making multiple tables, you forget the field names of a certain table, you can use the ‘GET FIELDS’ command and the program will give you the field names of that given table provided that the table already exists. For example, inputting the command ‘get fields from student’ will get you the field names of the student table you created. 
+The engine combines a custom database architecture with persistent binary file storage and a finite-state-machine parser for command interpretation. A vector of B+ Tree-backed multimaps provides efficient indexed lookups and range-based queries, while the Shunting Yard algorithm converts complex conditional expressions into postfix notation for subsequent evaluation.
 
-If you are not familiar with the syntax of SQL commands, there is no need to worry. This project also includes an ‘Error_Handler’ class that will help you troubleshoot any syntax errors you might have. Furthermore, you can always enter '?' in order to see the help menu for explanations and examples of the syntax. 
+## Key Features
 
+- **SQL-Like Query Processing:** Supports table creation, record insertion, data retrieval, and conditional selection.
+- **B+ Tree Indexing:** Uses custom B+ Tree-based maps and multimaps to organize field values and associated record references.
+- **Persistent Binary Storage:** Stores table records in binary files for retrieval across program executions.
+- **State-Machine-Based SQL Parser:** Tokenizes and parses commands using a finite-state machine.
+- **Complex Query Evaluation:** Uses the Shunting Yard algorithm to process relational and logical expressions, including nested conditions.
+- **Custom Data Structures:** Implements B+ Trees, maps, multimaps, stacks, queues, and linked-list utilities.
+- **Error Handling:** Validates commands and reports invalid SQL syntax or table-related errors.
+- **Interactive Console Interface:** Allows users to execute supported database commands and access usage instructions.
+
+---
+
+## Supported SQL Commands
+
+The database engine supports table creation, record insertion, data retrieval, and conditional queries using SQL-like syntax.
+
+| Command | Example | Description |
+|---------|---------|-------------|
+| `MAKE TABLE` | `make table student fields fname, lname, major, age` | Creates a table with specified fields |
+| `INSERT INTO` | `insert into student values Jane, Doe, CS, 24` | Inserts a new record |
+| `SELECT *` | `select * from student` | Retrieves all records and columns |
+| `SELECT` | `select age, lname from student` | Retrieves specified columns |
+| `SELECT WHERE` | `select * from student where age > 21` | Filters records using relational conditions |
+| `SELECT WHERE` | `select * from student where (age > 20 and major = CS) or (age < 25 and major = Math)` | Filters records using compound logical and relational conditions |
+| `GET FIELDS` | `get fields from student` | Displays a table's field names |
+
+The engine also includes an interactive Help Desk, accessible by entering `?`, which provides command syntax, usage examples, and guidance on supported SQL operations.
 
 # Making/Inserting Into Table Video
 https://github.com/barkeshli-CS008-classroom/99_99_final_project-QueencyT/assets/122432408/e6cfb4d3-ba29-487e-9f22-1de80ad202d6
