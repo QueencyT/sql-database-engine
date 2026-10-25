@@ -37,64 +37,130 @@ The database engine supports table creation, record insertion, data retrieval, a
 
 The engine also includes an interactive Help Desk, accessible by entering `?`, which provides command syntax, usage examples, and guidance on supported SQL operations.
 
-# Making/Inserting Into Table Video
-https://github.com/barkeshli-CS008-classroom/99_99_final_project-QueencyT/assets/122432408/e6cfb4d3-ba29-487e-9f22-1de80ad202d6
+## Showcase 
+https://github.com/user-attachments/assets/8f2fcecc-c925-45d7-b983-759f36b3ed48
 
-# Selecting From Table Video
-https://github.com/barkeshli-CS008-classroom/99_99_final_project-QueencyT/assets/122432408/aa8d1bd7-4af8-4874-93c2-7fa719281c9d
+## Error-Checking Showcase
+https://github.com/user-attachments/assets/38f8194d-862e-4927-8853-85971e665e71
 
-
-# How This Project Was Built: 
-This project uses data structures such as BPlusTrees, MultiMaps, and Maps for their ability to efficiently sort, store, and look-up records. This project also uses stacks, and queues in tandem with RPN and ShuntingYard algorithms in order to evaluate the user’s inputted commands.
-
-# Insert Command: 
-![Alt text](image-10.png)
-
-# Select Command:
-![Alt text](image-8.png)
-![Alt text](image-9.png)
-
-# Get Fields Command: 
-![Alt text](image-13.png)
-
-# Help Desk:
+# Help Desk Showcase
 Picture of Help Desk (which you can get by entering '?')
 ![Alt text](image-2.png)
 A Guide to all the Commands (which you can get by entering 'A')
 ![Alt text](image-3.png) 
 
-https://github.com/barkeshli-CS008-classroom/99_99_final_project-QueencyT/assets/122432408/f1747632-3361-4040-9c20-60962fc57a9e
+## System Architecture
 
-# Error Checking: 
-Sample of some error-checking features
-![Alt text](image-14.png)
+The database engine is organized into five primary components responsible for command processing, parsing, indexing, persistent storage, and query evaluation.
 
-https://github.com/barkeshli-CS008-classroom/99_99_final_project-QueencyT/assets/122432408/79d79651-8a52-4e7c-8555-75733eac81a7
+### 1. <ins>SQL Command Processing</ins>
 
-## EXTRA INFO: 
-# Technical Details: 
-All user inputs are tokenized using my ‘Stokenizer’ class into a vector of strings. Then that vector of strings is passed into my ‘Parser’ class which will parse the user’s input according to a state machine I designed. The ‘Parser’ class includes a map of all this project’s keywords (select,from,where,etc.) along with the column/row number they correspond to in the adjacency matrix. Anything that is not a number is treated as a ‘SYMBOL’ (table names, field names, etc) which my state machine will deal with accordingly. The purpose of the parser class is to create a multimap that stores/organizes the user’s input. I call this multimap the “statement tree”. An example of how this multimap would look like after parsing is this: 
+The `SQL` class serves as the primary interface between user commands and database operations.
 
-![Alt text](image-11.png)
+It receives SQL-like statements, invokes the parser, and dispatches valid commands to the appropriate `Table` operations.
 
-This multimap is later passed into my SQL class which will create a table to display to the user. The table is created according to the commands/conditions etc stored in the multimap/statement tree. 
+This separates command interpretation and execution coordination from the underlying data storage and indexing logic.
 
-All data is stored in binary files using the ‘write’ function of my ‘FileRecord’ class and retrieved using the ‘read’ function of my FileRecord class. All data storage and retrieval happens within this project’s Table class which uses read and write to manipulate the binary files. When the table class reads from the binary file, it stores the data into a vector of multimap<string,long>. Each Multimap represents a field (age, fname, lname,etc) and within those multimaps are specific values of that field (the age multimap would have  values like “21" : [vector of recnos], “20” : [vector of recnos], etc). Long is for the record numbers that contain those values. For example, “21” : [10,15,16] means records 10,15, and 16 all have an age of 21.
+### 2. <ins>Finite-State-Machine Parsing</ins>
 
-Storing my data this way allows me to use the iterator functions of my Multimap class ('upper_bound', 'lower_bound', 'begin', and 'end'). The function ‘upper_bound’ and ‘lower_bound’ will return an iterator to the upper and lower bounds of any value you enter while 'end' and 'begin' will return an iterator to the “smallest” value and “largest” value in the Multimap respectively. I use these iterator functions to efficiently select the appropriate values according to the user’s condition. For example, if the user wanted to find all the records with “age > 21”, I would first obtain the upper bound of 21 and then I’d iterate from the upper bound to the end, which would give me all the values greater than 21 along with the record numbers that have those values. I do similar things to evaluate the other relational operators (>,<,etc). 
+The `Parser` class uses a finite-state machine to recognize supported SQL-like command structures.
 
-# Challenges I Faced when Making this Project 
+Input statements are tokenized and processed through a state-transition table to identify command keywords, table names, field names, values, and conditional expressions.
 
-One challenge I faced was when I was designing the ‘Interaction’ and ‘Error_Handler’ classes. When designing them, I wasn't sure whether I should have my Interaction class own an ‘Error_Handler’ object and do all my error checking/correction in my interaction class, so my SQL class only ever receives completely valid commands or to have my SQL class do its own error-checking, meaning I would allow nonsense user input to be passed into SQL. Originally, I thought it would be more intuitive to have my interaction class own an error handler object, so I could have code like this
+The resulting parse tree organizes these components for execution by the database engine.
 
-![Alt text](image-12.png)
+### 3. <ins>B+ Tree Indexing</ins>
 
-But doing so meant that even in the best case scenario (user inputs a valid command first try), I would be parsing the user's input twice. Once during the initial check for errors, and then again when I pass the user string into SQL. There were a couple workarounds I could think of to continue error handling in the Interaction class while avoiding the double-parsing problem, but I felt the solutions were a bit clumsy. Ultimately, I decided to go with the second route, having the SQL class do its own error-checking, which avoids the double parsing problem while still being a relatively clean solution. 
+Each table maintains a vector of B+ Tree-backed multimaps, with each multimap indexing a separate column.
 
-<br><br>
+Field values (CS, Math, etc.) are associated with lists of record numbers, allowing multiple records to share the same indexed value.
 
-<br><br>
+For example, a `major` column might be indexed as follows:
 
-<br><br>
+```text
+Major Index (B+ Tree-backed multimap)
 
-<br><br>
+"CS"    -> [0, 2, 4]
+"Math"  -> [1, 5]
+"Physics" -> [3]
+```
+<sup>record numbers 0, 2, 4 share the same indexed value "CS"</sup>
+
+A vector of B+ Tree-backed multimaps was chosen to organize column indexes in a contiguous, dynamically sized structure, allowing each column's index to be accessed directly by its position. A separate field-name map associates field names with vector indices, enabling efficient retrieval of the appropriate multimap during query execution. B+ Trees maintain sorted keys for efficient equality lookups and range-based queries, while multimaps support duplicate field values by mapping each key to multiple record numbers. This design simplifies index management and allows indexes to be updated systematically during record insertion.
+
+### 4. <ins>Persistent Binary File Storage</ins>
+
+Table records are stored in binary files using the `FileRecord` class.
+
+When a record is inserted, the engine writes its contents to persistent storage and updates each column's multimap with the corresponding record number.
+
+When an existing table is loaded, the engine reads its stored records and reconstructs the in-memory indexes.
+
+This design separates persistent record storage from indexed data retrieval.
+
+### 5. <ins>Conditional Query Evaluation</ins>
+
+The engine processes conditional expressions using the Shunting Yard algorithm and stack-based postfix evaluation.
+
+The Shunting Yard algorithm converts infix expressions into Reverse Polish Notation (RPN), accounting for operator precedence and parentheses.
+
+During evaluation:
+
+1. Relational operators (`=`, `<`, `>`, `<=`, `>=`) retrieve matching record numbers from the appropriate column indexes.
+2. The `and` operator computes the intersection of matching record sets.
+3. The `or` operator combines matching record sets through union.
+4. The resulting record numbers identify the rows to retrieve from binary storage.
+
+This allows the engine to evaluate compound conditions while keeping parsing, indexing, and record retrieval as separate operations.
+
+---
+
+## Core Components
+
+The engine is implemented using reusable C++ classes and custom data structures.
+
+| Component | Responsibility |
+|-----------|----------------|
+| `SQL` | Processes commands and coordinates database operations |
+| `Parser` | Interprets SQL-like statements using a finite-state machine |
+| `Table` | Manages table records, column indexes, insertion, and selection |
+| `BPlusTree` | Implements the underlying ordered tree structure |
+| `Map` | Maps individual keys to associated values |
+| `MMap` | Maps field values to lists of corresponding record numbers |
+| `ShuntingYard` | Converts conditional expressions from infix to postfix notation |
+| `FileRecord` | Handles binary record storage and retrieval |
+| `Stack` / `Queue` | Support expression conversion and evaluation |
+| `Interaction` | Provides the command-line interface and interactive Help Desk |
+
+---
+
+## Development Challenges
+
+One architectural challenge was deciding whether command validation should be handled by the Interaction class or the SQL class. Initially, I considered validating commands in Interaction before passing them to SQL, but this approach would require parsing each command twice: once for validation and again for execution.
+
+I ultimately centralized command validation within the SQL class, eliminating redundant parsing and allowing the command-line interface to focus on user interaction. This design improved separation of concerns and ensured that the database engine could independently validate incoming commands.
+
+---
+
+## Testing
+
+The project includes test programs for validating SQL command processing, data structure behavior, and database operations.
+
+Key test scenarios include:
+
+- Table creation and record insertion
+- Selection of all records or specific columns
+- Equality and range-based comparisons
+- Compound `and` / `or` expressions
+- Parenthesized conditional expressions
+- Command parsing and invalid-input handling
+- Record retrieval and indexed query execution
+
+---
+
+## Project Information
+
+**Developer:** Queency Tan  
+**Language:** C++  
+**Interface:** Command-line application  
+**Project Type:** Database Management System
