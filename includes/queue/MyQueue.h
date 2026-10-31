@@ -3,6 +3,7 @@
 #include "../../includes/node/node.h"
 #include "../../includes/linked_list_functions/linkedlistfunctionsTemplated.h"
 #include "assert.h"
+#include <stdexcept>
 
 using namespace std; 
 
