@@ -1,13 +1,14 @@
 #ifndef LINKED_LISTS_H 
 #define LINKED_LISTS_H
-#include "assert.h"
+#include <cassert>
+#include <stdexcept>
 #include "../../includes/node/node.h"
 
 //Linked List General Functions:
 template <typename T>
 void _print_list(node<T>* head){
     node<T>* nodeWalker = head; 
-    while(nodeWalker != NULL){
+    while(nodeWalker != nullptr){
         cout<<*nodeWalker; 
         nodeWalker = nodeWalker->_next;
     }
@@ -17,37 +18,54 @@ void _print_list(node<T>* head){
 //recursive fun! :)
 template <typename T>
 void _print_list_backwards(node<T> *head){
-    
+     if (head == nullptr) {
+        return;
+    }
+
+    // Find the tail
+    node<T>* current = head;
+
+    while (current->_next != nullptr) {
+        current = current->_next;
+    }
+
+    // Traverse backward
+    while (current != nullptr) {
+        cout << *current;
+        current = current->_prev;
+    }
+
+    cout << '\n';
 }
 
 //return ptr to key or NULL
 template <typename T>
 node<T>* _search_list(node<T>* head, T key){
     node<T>* nodeWalker = head; 
-    while(nodeWalker != NULL){
+    while(nodeWalker != nullptr){
         if(nodeWalker->_item == key){ 
             return nodeWalker; 
         }
         nodeWalker = nodeWalker->_next; 
     }
-    return NULL; //if not found
+    return nullptr; //if not found
 }
 
 //ptr to previous node
 template <typename T>
 node<T>* _previous_node(node<T>* prev_to_this){
-    return prev_to_this->_prev; 
+    return prev_to_this == nullptr ? nullptr : prev_to_this->_prev; 
 }
 
 template <typename T>
 node<T>* _insert_head(node<T> *&head, T insert_this){
     //item, next, prev
-    if(head == NULL){ //If list empty
-        head = new node<T>(insert_this, NULL, NULL); 
+    if(head == nullptr){ //If list empty
+        head = new node<T>(insert_this, nullptr, nullptr); 
         return head; 
     }
 
-    node<T>* newHead = new node<T>(insert_this, head, NULL); 
+    node<T>* newHead = new node<T>(insert_this, head, nullptr); 
     head->_prev = newHead; 
     head = newHead;
     return newHead; //assuming we're returning the newhead
@@ -58,7 +76,7 @@ node<T>* _insert_head(node<T> *&head, T insert_this){
 //insert after ptr: insert head if marker null --> if empty
 template <typename T>
 node<T>* _insert_after(node<T>*& head, node<T> *after_this, T insert_this){
-    if(after_this == NULL || head == NULL){//if list empty insert at head 
+    if(after_this == nullptr || head == nullptr){//if list empty insert at head 
         return _insert_head(head, insert_this); 
     }
 
@@ -66,67 +84,57 @@ node<T>* _insert_after(node<T>*& head, node<T> *after_this, T insert_this){
     node<T>* nextNextNode = after_this->_next; 
     after_this->_next = insertNode; 
 
-    if(nextNextNode != NULL){//to take care of inserting end case
+    if(nextNextNode != nullptr){//to take care of inserting end case
         nextNextNode->_prev = insertNode; 
     }
 
     return insertNode; //assuming we are returning inserted node 
 }
 
-//insert before ptr: insert head if marker null --> if empty
 template <typename T>
-node<T>* _insert_before(node<T>*& head, node<T>* before_this, T insert_this){
-    if(before_this == head || head == NULL){ //if empty, insert head
-        return _insert_head(head, insert_this); 
+node<T>* _insert_before(node<T>*& head, node<T>* before_this, T item) {
+    if (head == nullptr || before_this == head) {
+        return _insert_head(head, item);
     }
-    node<T>* insertNode = new node<T>(insert_this, before_this, before_this->_prev); 
-    node<T>* beforeNode = before_this->_prev; 
-    beforeNode->_next = insertNode; 
-    before_this->_prev = insertNode; 
-    return insertNode; //assuming we are returning insertedNode 
+
+    assert(before_this != nullptr);
+    node<T>* previous = before_this->_prev; //if before_this is valid, then previous should never be null
+    assert(previous != nullptr);
+    node<T>* newNode = new node<T>(item, before_this, previous);
+    previous->_next = newNode;
+    before_this->_prev = newNode;
+    return newNode;
 }
 
-//delete, return item
-//what if head? // what if end? //what if empty? 
 template <typename T>
 T _delete_node(node<T>*& head, node<T>* delete_this){
-    assert(head != NULL); //if empty, don't run
-    T deletedItem = delete_this->_item; 
-    if(delete_this == head){ //deleting at beginning --> need this
-        node<T>* newHead = delete_this->_next; 
-        delete head; 
-        head = newHead; 
-        return deletedItem; 
+    assert(head != nullptr);
+    assert(delete_this != nullptr);
+
+    T deletedItem = delete_this->_item;
+
+    // Deleting the head
+    if (delete_this == head) {
+        head = head->_next;
+
+        if (head != nullptr) 
+            head->_prev = nullptr;
+
+        delete delete_this;
+        return deletedItem;
     }
 
-    node<T>* prevNode = delete_this->_prev; 
-    node<T>* nextNode = delete_this->_next; 
-    prevNode->_next = nextNode; 
+    // Deleting a middle or last node
+    node<T>* prevNode = delete_this->_prev;
+    node<T>* nextNode = delete_this->_next;
 
-    if(nextNode != NULL){ //should handle deleting at end case
-        nextNode->_prev = prevNode; 
-    }
+    prevNode->_next = nextNode;
 
-    delete delete_this; 
-    return deletedItem; 
-}
+    if (nextNode != nullptr)
+        nextNode->_prev = prevNode;
 
-//duplicate the list...
-template <typename T>
-node<T>* _copy_list(node<T>* head){
-    node<T>* nodeWalker = head; 
-    node<T>* newHead = NULL; 
-    node<T>* insertedHere = NULL; 
-
-    if(head == nullptr){
-        return nullptr; 
-    }
-
-    while(nodeWalker != NULL){
-        insertedHere = _insert_after(newHead, insertedHere, nodeWalker->_item); 
-        nodeWalker = nodeWalker->_next; 
-    }
-    return newHead; 
+    delete delete_this;
+    return deletedItem;
 }
 
 //duplicate the list, return pointer to last node in dest... 
@@ -136,22 +144,24 @@ node<T>* _copy_list(node<T>* head){
 
 template <typename T>
 node<T> *_copy_list(node<T> *&destHead, node<T> *srcHead){
+    assert(destHead == nullptr);
     node<T>* srcWalker = srcHead; 
-    node<T>* destWalker = NULL; 
-
-    if(srcHead == nullptr){ //for empty case?
-        destHead = nullptr; 
-        return destHead; 
-    }
+    node<T>* destWalker = nullptr; 
     
-    while(srcWalker != NULL){
+    while(srcWalker != nullptr){
         destWalker = _insert_after(destHead, destWalker, srcWalker->_item); 
         srcWalker = srcWalker->_next; 
     }
-
-    //cout<<"destWalker: "<<destWalker->_item<<endl; 
-    return destWalker; //WAS SRCWALKER BEFORE
+    return destWalker; 
 }
+
+template <typename T>
+node<T>* _copy_list(node<T>* head) {
+    node<T>* newHead = nullptr;
+    _copy_list(newHead, head);
+    return newHead;
+}
+
 
 //delete all the nodes
 template <typename T>
@@ -159,7 +169,7 @@ void _clear_list(node<T>*& head){
     node<T>* nodeWalker = head; 
     node<T>* temp; 
 
-    while(nodeWalker != NULL){
+    while(nodeWalker != nullptr){
         temp = nodeWalker->_next; 
         delete nodeWalker; 
         nodeWalker = temp; 
@@ -169,11 +179,18 @@ void _clear_list(node<T>*& head){
 
 //_item at this position
 template <typename T>
-T& _at(node<T>* head, int pos){ //assuming pos indexed from 0?
+T& _at(node<T>* head, int pos){ //assuming pos indexed from 0? //assuming pos is valid
+    if (pos < 0)
+        throw std::out_of_range("Position cannot be negative");
+
     node<T>* nodeWalker = head; 
-    for(int i = 0; i < pos; i++){
+    for(int i = 0; i < pos && nodeWalker; i++){
         nodeWalker = nodeWalker->_next; 
     }
+
+    if(nodeWalker == nullptr) 
+        throw std::out_of_range("Position is out of range");
+
     return nodeWalker->_item; 
 }
 
