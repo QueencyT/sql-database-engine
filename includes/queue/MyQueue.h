@@ -29,7 +29,7 @@ public:
         //dereference operator
 
         bool is_null(){
-            return (_ptr == NULL); 
+            return (_ptr == nullptr); 
         }            
         //true if _ptr is NULL
 
@@ -43,15 +43,14 @@ public:
         }
         //true if left == right
 
-        Iterator& operator++(){ //member operator:++it // or ++it = new_value
-            //assuming _ptr != null --> but what if null
-            //assert(_ptr != NULL); 
+        Iterator& operator++(){ //member operator:++it // or ++it = new_value //assuming _ptr != null --> but what if null
+            assert(_ptr != nullptr); 
             _ptr = _ptr->_next; 
             return *this; 
         }
 
         friend Iterator operator++(Iterator& it, int unused){//friend operator: it++
-            assert(it._ptr != NULL);
+            assert(it._ptr != nullptr);
             Iterator returnIter = Iterator(it._ptr); 
             it._ptr = it._ptr->_next; 
             return returnIter; 
@@ -88,8 +87,8 @@ private:
 
 template <typename T>
 Queue<T>::Queue(){
-    _front = NULL; 
-    _rear = NULL; 
+    _front = nullptr; 
+    _rear = nullptr; 
     _size = 0; 
 }
 
@@ -97,7 +96,7 @@ Queue<T>::Queue(){
 //copy ctor
 template <typename T> 
 Queue<T>::Queue(const Queue<T>& copyMe){
-    _front = NULL; 
+    _front = nullptr; 
     _rear = _copy_list(_front, copyMe._front); 
     _size = copyMe._size; 
 }
@@ -107,11 +106,11 @@ Queue<T>& Queue<T>::operator=(const Queue<T>& RHS){
     if(this == &RHS){
         return *this; 
     }
-    _clear_list(_front);  //must do clear list
+    _clear_list(_front);  
     _front = nullptr; 
     _rear = _copy_list(_front, RHS._front); 
     _size = RHS._size; 
-    return *this; //return *this
+    return *this; 
 }
 
 template <typename T>
@@ -124,17 +123,21 @@ Queue<T>::~Queue(){
 
 template <typename T>
 bool Queue<T>::empty(){
-    return (_front == NULL); 
+    return (_front == nullptr); 
     //_front == _rear does not necessarily mean list empty, means there could be one item left and they're both pointing there
 }
 
 template <typename T>
 T Queue<T>::front(){
+    if(empty())
+        throw std::underflow_error("Queue is empty. No front element.");
     return _front->_item; 
 }
 
 template <typename T>
 T Queue<T>::back(){
+    if(empty())
+        throw std::underflow_error("Queue is empty. No back element.");
     return _rear->_item; 
 }
 
@@ -147,10 +150,19 @@ void Queue<T>::push(T item){
 }
 
 template <typename T>
-T Queue<T>::pop(){
-    _size--; 
-   return _delete_node(_front, _front); 
+T Queue<T>::pop() {
+    if (empty())
+        throw std::underflow_error("Cannot pop from empty queue");
+
+    T deletedItem = _delete_node(_front, _front);
+    --_size;
+
+    if (_front == nullptr)
+        _rear = nullptr;
+
+    return deletedItem;
 }
+
 
 template <typename T>
 typename Queue<T>::Iterator Queue<T>::begin() const{
